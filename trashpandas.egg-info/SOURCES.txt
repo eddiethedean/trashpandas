@@ -1,0 +1,8 @@
+README.md
+setup.py
+trashpandas/__init__.py
+trashpandas.egg-info/PKG-INFO
+trashpandas.egg-info/SOURCES.txt
+trashpandas.egg-info/dependency_links.txt
+trashpandas.egg-info/requires.txt
+trashpandas.egg-info/top_level.txt

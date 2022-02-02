@@ -1,3 +1,18 @@
+Metadata-Version: 2.1
+Name: trashpandas
+Version: 0.0.2
+Summary: Persistent Pandas DataFrame storage and retrieval using a SQL database, CSV files, HDF5, or pickle files.
+Home-page: https://github.com/eddiethedean/trashpandas
+Author: Odos Matthews
+Author-email: odosmatthews@gmail.com
+License: MIT
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+
 ![TrashPandas Logo](https://raw.githubusercontent.com/eddiethedean/trashpandas/ef8b3b0b6394ac6be905e423447b0c238faba03d/docs/trashpanda.svg)
 -----------------
 
@@ -35,3 +50,4 @@ pip install trashpandas
 ```sh
 import trashpandas as ts
 ```
+

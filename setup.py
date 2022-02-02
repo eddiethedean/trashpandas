@@ -7,7 +7,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="trashpandas",
-    version="0.0.0",
+    version="0.0.2",
     description="Persistent Pandas DataFrame storage and retrieval using a SQL database, CSV files, HDF5, or pickle files.",
     long_description=README,
     long_description_content_type="text/markdown",
