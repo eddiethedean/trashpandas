@@ -1,7 +1,7 @@
 ![TrashPandas Logo](https://raw.githubusercontent.com/eddiethedean/trashpandas/ef8b3b0b6394ac6be905e423447b0c238faba03d/docs/trashpanda.svg)
 -----------------
 
-# Sessionize: intutive Python SQL table manipulation toolkit
+# TrashPandas: Persistent Pandas DataFrame Storage and Retrieval
 [![PyPI Latest Release](https://img.shields.io/pypi/v/trashpandas.svg)](https://pypi.org/project/trashpandas/)
 
 ## What is it?

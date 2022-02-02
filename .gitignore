@@ -1,0 +1,12 @@
+creds.py
+notebooks/
+
+trashpandas.egg-info/
+trashpandas/__pycache__/
+dist/
+data/
+build/
+.vscode/
+.ipynb_checkpoints/
+__pycache__/
+tests/__pycache__/
