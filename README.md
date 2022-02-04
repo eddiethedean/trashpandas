@@ -1,4 +1,4 @@
-![TrashPandas Logo](https://raw.githubusercontent.com/eddiethedean/trashpandas/ef8b3b0b6394ac6be905e423447b0c238faba03d/docs/trashpanda.svg)
+![TrashPandas Logo](https://raw.githubusercontent.com/eddiethedean/trashpandas/main/docs/trashpanda.svg)
 -----------------
 
 # TrashPandas: Persistent Pandas DataFrame Storage and Retrieval
@@ -33,5 +33,38 @@ pip install trashpandas
 
 ## Example
 ```sh
-import trashpandas as ts
+import pandas as pd
+import sqlalchemy as sa
+import trashpandas as tp
+
+df = pd.DataFrame({'name': ['Joe', 'Bob', 'John'], 'age': [23, 34, 44]})
+
+# Create SqlStorage object with sqlite database connection string.
+storage = tp.SqlStorage('sqlite:///test.db')
+# or create an engine with SQLAlchemy and pass it into SqlStorage
+engine = sa.create_engine('sqlite:///test.db')
+storage = tp.SqlStorage(engine)
+
+# Store DataFrame in database as table named 'people'
+# and store metadata as table named '_people_metadata'
+storage.store(df, 'people') 
+# or assign DataFrame to item
+storage['people'] = df
+
+# Retrieve DataFrame from SqlStorage object.
+df = storage.load('people')
+# or use table name key
+df = storage['people']
+
+# Delete stored sql table using SqlStorage delete method.
+storage.delete('people')
+# or use del on table name key
+del storage['people']
+
+# Or use functions instead of SqlStorage class
+tp.store_df_sql(df, 'people', engine)
+
+df = tp.load_df_sql('people', engine)
+
+tp.delete_table_sql('people', engine)
 ```
