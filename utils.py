@@ -35,3 +35,9 @@ def cast_type(series):
 
 def convert_meta_to_dict(meta: DataFrame) -> dict:
     return {col: typ for col, typ in zip(meta['column'], meta['datatype'])}
+
+
+def df_cols_to_numpy(df: DataFrame) -> None:
+    """Convert each column to numpy data type"""
+    for name in df.columns:
+        df[name] = df[name].to_numpy()
