@@ -1,6 +1,12 @@
 README.md
 setup.py
 trashpandas/__init__.py
+trashpandas/conversion.py
+trashpandas/csv.py
+trashpandas/hdf5.py
+trashpandas/interfaces.py
+trashpandas/pickle.py
+trashpandas/sql.py
 trashpandas.egg-info/PKG-INFO
 trashpandas.egg-info/SOURCES.txt
 trashpandas.egg-info/dependency_links.txt

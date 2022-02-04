@@ -1,3 +1,4 @@
 SQLAlchemy
 pandas
 h5py
+tables
