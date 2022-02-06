@@ -55,9 +55,7 @@ class HdfStorage(IStorage):
         """Takes folder path to hdf5 file where DataFrames and metadata are stored."""
         self.path = hdf5_path
         # create hdf5 file if it doesn't exist
-        if not os.path.exists(hdf5_path):
-            hf = File(hdf5_path, 'w')
-            hf.close()
+        create_hdf5_file(hdf5_path)
 
     def __repr__(self) -> str:
         return f"HdfStorage('{self.path}')"
@@ -84,7 +82,7 @@ class HdfStorage(IStorage):
 
     def delete(self, table_name: str) -> None:
         """Delete DataFrame and metadata from hdf5 file."""
-        delete_table_hdf5(self.path, table_name)
+        delete_table_hdf5(table_name, self.path)
 
     def load_metadata(self, table_name: str, schema=None) -> DataFrame:
         """Retrieve DataFrame metadata from hdf5 file."""
@@ -99,12 +97,20 @@ class HdfStorage(IStorage):
         return metadata_names_hdf5(self.path)
 
 
+def create_hdf5_file(path: str) -> None:
+    """Create hdf5 file if it doesn't exist"""
+    if not os.path.exists(path):
+        hf = File(path, 'w')
+        hf.close()
+
+
 def store_df_hdf5(df: DataFrame, table_name: str, path: str) -> None:
     """Store DataFrame and metadata in hdf5 file."""
     df = df.copy()
     name_no_names(df)
     metadata = df_metadata(df)
     df_cols_to_numpy(df)
+    create_hdf5_file(path)
     df.to_hdf(path, key=table_name)
     metadata.to_hdf(path, key=f'_{table_name}_metadata', index=False)
 
@@ -124,7 +130,7 @@ def load_df_hdf5(table_name: str, path: str) -> DataFrame:
     return df
 
 
-def delete_table_hdf5(path: str, table_name: str) -> None:
+def delete_table_hdf5(table_name: str, path: str) -> None:
     """Delete DataFrame and metadata from hdf5 file."""
     meta_name = f'_{table_name}_metadata'
     with File(path,  "a") as hf:
