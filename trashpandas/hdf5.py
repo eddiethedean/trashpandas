@@ -46,8 +46,8 @@ from h5py import File
 from pandas import DataFrame, read_hdf
 
 from trashpandas.interfaces import IStorage
-from utils import cast_type, convert_meta_to_dict, df_metadata, name_no_names, unname_no_names
-from utils import df_cols_to_numpy
+from trashpandas.utils import cast_type, convert_meta_to_dict, df_metadata, name_no_names, unname_no_names
+from trashpandas.utils import df_cols_to_numpy
 
 
 class HdfStorage(IStorage):

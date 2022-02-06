@@ -51,7 +51,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.schema import DropTable
 
 from trashpandas.interfaces import IStorage
-from utils import cast_type, convert_meta_to_dict, df_metadata, name_no_names, unname_no_names
+from trashpandas.utils import cast_type, convert_meta_to_dict, df_metadata, name_no_names, unname_no_names
 
 
 class SqlStorage(IStorage):
