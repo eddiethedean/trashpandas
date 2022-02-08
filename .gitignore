@@ -1,7 +1,7 @@
 creds.py
 notebooks/
 
-
+trashpandas.egg-info/
 trashpandas/__pycache__/
 dist/
 data/
