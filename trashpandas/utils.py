@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from pandas.core.dtypes.cast import pandas_dtype
+from pandas.core.dtypes.common import pandas_dtype
 
 
 def df_metadata(df: DataFrame) -> DataFrame:
@@ -9,7 +9,7 @@ def df_metadata(df: DataFrame) -> DataFrame:
     indexes = DataFrame({'column': [f'_no_name_{i}' if name==None else name for i, name in enumerate(df.index.names)],
                             'index': True,
                             'datatype': str(df.index.dtype) if len(df.index.names)==1
-                                            else [str(dt) for dt in df.index.dtypes]})
+                                            else [str(dt) for dt in df.index.dtypes]})  # type: ignore
     return indexes.append(columns).reset_index(drop=True)
 
 

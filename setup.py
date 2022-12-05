@@ -7,8 +7,8 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="trashpandas",
-    version="0.0.5",
-    description="Persistent Pandas DataFrame storage and retrieval using a SQL database, CSV files, HDF5, or pickle files.",
+    version="0.0.7",
+    description="Persistent Pandas DataFrame storage and retrieval using a SQL database, HDF5, CSV files, or pickle files.",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/eddiethedean/trashpandas",
@@ -23,5 +23,8 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     python_requires='>=3.9',
-    install_requires=['SQLAlchemy', 'pandas', 'h5py', 'tables']
+    install_requires=['SQLAlchemy', 'pandas', 'tables'],
+    extras_require={
+        "HDF5": ["h5py"],
+    }
 )

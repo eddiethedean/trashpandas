@@ -169,12 +169,12 @@ def _read_cast_metadata_hdf5(table_name: str, path: str) -> DataFrame:
     """Load metadata table and cast column datatypes column."""
     meta = read_hdf(path, key=table_name)
     meta['datatype'] = cast_type(meta['datatype'])
-    return meta
+    return DataFrame(meta)
 
 
 def _first_load_df_hdf5(table_name: str, path: str) -> DataFrame:
     """Load a sql table that has no metadata stored, create and store metadata"""
     # Load a table that has no metadata stored, create and store metadata
-    df = read_hdf(path, key=table_name)
+    df = DataFrame(read_hdf(path, key=table_name))
     store_df_hdf5(df, table_name, path)
     return df
