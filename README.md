@@ -68,3 +68,5 @@ df = tp.load_df_sql('people', engine)
 
 tp.delete_table_sql('people', engine)
 ```
+
+![Tests](https://github.com/eddiethedean/trashpandas/actions/workflows/tests.yml/badge.svg)
