@@ -3,6 +3,7 @@
 
 # TrashPandas: Persistent Pandas DataFrame Storage and Retrieval
 [![PyPI Latest Release](https://img.shields.io/pypi/v/trashpandas.svg)](https://pypi.org/project/trashpandas/)
+![Tests](https://github.com/eddiethedean/trashpandas/actions/workflows/tests.yml/badge.svg)
 
 ## What is it?
 
@@ -68,5 +69,3 @@ df = tp.load_df_sql('people', engine)
 
 tp.delete_table_sql('people', engine)
 ```
-
-![Tests](https://github.com/eddiethedean/trashpandas/actions/workflows/tests.yml/badge.svg)
