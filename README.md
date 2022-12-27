@@ -12,7 +12,7 @@
 Here are just a few of the things that TrashPandas does well:
 
   - Store Pandas DataFrames in your choice of format. (SQL, CSV, HDF5, pickle)
-  - Retrieve the Pandas DataFrame with the same same indexes and data types you stored.
+  - Retrieve the Pandas DataFrame with the same indexes and data types you stored.
   - Transfer your DataFrames between storage formats.
 
 ## Where to get it
