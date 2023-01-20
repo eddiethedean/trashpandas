@@ -41,6 +41,7 @@ tp.delete_table_hdf5('people', 'data.h5')
 """
 
 import os
+from typing import List
 
 from h5py import File
 from pandas import DataFrame, read_hdf
@@ -88,11 +89,11 @@ class HdfStorage(IStorage):
         """Retrieve DataFrame metadata from hdf5 file."""
         return load_metadata_hdf5(table_name, self.path)
 
-    def table_names(self) -> list[str]:
+    def table_names(self) -> List[str]:
         """Get list of stored non-metadata table names."""
         return table_names_hdf5(self.path)
 
-    def metadata_names(self) -> list[str]:
+    def metadata_names(self) -> List[str]:
         """Get list of stored metadata table names."""
         return metadata_names_hdf5(self.path)
 
@@ -144,21 +145,21 @@ def load_metadata_hdf5(table_name: str, path: str) -> DataFrame:
     return _read_cast_metadata_hdf5(meta_name, path)
 
 
-def table_names_hdf5(path: str) -> list[str]:
+def table_names_hdf5(path: str) -> List[str]:
     """Get list of stored non-metadata table names."""
     table_names = _hdf5_keys(path)
     return [name for name in table_names
                 if '_metadata' not in name and name[0]!='_']
 
 
-def metadata_names_hdf5(path: str) -> list[str]:
+def metadata_names_hdf5(path: str) -> List[str]:
     """Get list of stored metadata table names."""
     table_names = _hdf5_keys(path)
     return [name for name in table_names
                 if '_metadata' in name and name[0]=='_']
 
 
-def _hdf5_keys(path: str) -> list[str]:
+def _hdf5_keys(path: str) -> List[str]:
     """Get list of all stored table names."""
     with File(path, 'r') as hf:
         names = list(hf.keys())

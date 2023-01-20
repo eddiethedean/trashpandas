@@ -1,5 +1,5 @@
 import abc
-from typing import Optional
+from typing import Optional, List
 
 from pandas import DataFrame
 
@@ -36,7 +36,7 @@ class IStorage(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def table_names(self, schema: Optional[str] = None) -> list[str]:
+    def table_names(self, schema: Optional[str] = None) -> List[str]:
         """Get list of stored table names."""
         raise NotImplementedError
 

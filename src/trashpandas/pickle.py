@@ -37,6 +37,7 @@ tp.delete_table_pickle('people', '')
 """
 
 import os
+from typing import List
 
 from pandas import DataFrame, read_pickle
 
@@ -76,7 +77,7 @@ class PickleStorage(IStorage):
         """Delete DataFrame pickle file."""
         delete_table_pickle(table_name, self.path, self.file_extension)
 
-    def table_names(self) -> list[str]:
+    def table_names(self) -> List[str]:
         """Get list of stored table names."""
         return table_names_pickle(self.path)
 
@@ -99,7 +100,7 @@ def delete_table_pickle(table_name: str, path: str, file_extension: str = '.pick
     os.remove(pickle_path)
 
 
-def table_names_pickle(path: str, file_extension: str = '.pickle') -> list[str]:
+def table_names_pickle(path: str, file_extension: str = '.pickle') -> List[str]:
     """Get list of stored table names."""
     filenames = os.listdir(path)
     return [filename.split(file_extension)[0] for filename in filenames

@@ -43,7 +43,7 @@ df = tp.load_df_sql('people', engine)
 tp.delete_table_sql('people', engine)
 """
 
-from typing import Union, Optional
+from typing import List, Union, Optional
 
 from pandas import DataFrame, read_sql_table
 from sqlalchemy import inspect, Table, MetaData, create_engine
@@ -92,11 +92,11 @@ class SqlStorage(IStorage):
         """Retrieve DataFrame metadata from database."""
         return load_metadata_sql(table_name, self.engine, schema=schema)
 
-    def table_names(self, schema: Optional[str] = None) -> list[str]:
+    def table_names(self, schema: Optional[str] = None) -> List[str]:
         """Query database for list of non-metadata table names."""
         return table_names_sql(self.engine, schema=schema)
 
-    def metadata_names(self, schema: Optional[str] = None) -> list[str]:
+    def metadata_names(self, schema: Optional[str] = None) -> List[str]:
         """Query database for list of metadata table names."""
         return metadata_names_sql(self.engine, schema=schema)
 
@@ -139,13 +139,13 @@ def load_metadata_sql(table_name: str, engine: Engine, schema=None) -> DataFrame
     return _read_cast_metadata_sql(meta_name, engine, schema=schema)
 
 
-def table_names_sql(engine: Engine, schema=None) -> list[str]:
+def table_names_sql(engine: Engine, schema=None) -> List[str]:
     """Query database for list of non-metadata table names."""
     table_names = inspect(engine).get_table_names(schema=schema)
     return [name for name in table_names if '_metadata' not in name and name[0]!='_']
 
 
-def metadata_names_sql(engine: Engine, schema=None) -> list[str]:
+def metadata_names_sql(engine: Engine, schema=None) -> List[str]:
     """Query database for list of metadata table names."""
     table_names = inspect(engine).get_table_names(schema=schema)
     return [name for name in table_names if '_metadata' in name and name[0]=='_']

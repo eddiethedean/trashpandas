@@ -40,6 +40,7 @@ tp.delete_table_csv('people', '')
 """
 
 import os
+from typing import List
 
 from pandas import DataFrame, read_csv
 
@@ -83,11 +84,11 @@ class CsvStorage(IStorage):
         """Retrieve DataFrame metadata from csv file."""
         return load_metadata_csv(table_name, self.path)
 
-    def table_names(self) -> list[str]:
+    def table_names(self) -> List[str]:
         """Get list of stored non-metadata table names."""
         return table_names_csv(self.path)
 
-    def metdata_names(self) -> list[str]:
+    def metdata_names(self) -> List[str]:
         """Get list of stored metadata table names."""
         return metadata_names_csv(self.path)
 
@@ -132,14 +133,14 @@ def load_metadata_csv(table_name: str, path: str) -> DataFrame:
     return _read_cast_metadata_csv(meta_name, path)
 
 
-def table_names_csv(path: str) -> list[str]:
+def table_names_csv(path: str) -> List[str]:
     """Get list of stored non-metadata table names."""
     filenames = os.listdir(path)
     return [filename.split('.csv')[0] for filename in filenames
                 if filename.endswith('.csv') and '_metadata' not in filename]
 
 
-def metadata_names_csv(path: str) -> list[str]:
+def metadata_names_csv(path: str) -> List[str]:
     """Get list of stored metadata table names."""
     filenames = os.listdir(path)
     return [filename.split('.csv')[0] for filename in filenames
