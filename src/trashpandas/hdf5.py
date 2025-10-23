@@ -40,23 +40,27 @@ df = tp.load_df_hdf5('people', 'data.h5')
 tp.delete_table_hdf5('people', 'data.h5')
 """
 
+from __future__ import annotations
+
 import os
-from typing import List
+from pathlib import Path
+from typing import List, Iterator, Union, Optional, Dict
 
 from h5py import File
 from pandas import DataFrame, read_hdf
 
-from trashpandas.interfaces import IStorage
+from trashpandas.interfaces import IStorage, IFileStorage
 from trashpandas.utils import cast_type, convert_meta_to_dict, df_metadata, name_no_names, unname_no_names
 from trashpandas.utils import df_cols_to_numpy
+from trashpandas.exceptions import TableNotFoundError
 
 
-class HdfStorage(IStorage):
-    def __init__(self, hdf5_path: str) -> None:
+class HdfStorage(IFileStorage):
+    def __init__(self, hdf5_path: Union[str, Path]) -> None:
         """Takes folder path to hdf5 file where DataFrames and metadata are stored."""
-        self.path = hdf5_path
+        self.path = Path(hdf5_path)
         # create hdf5 file if it doesn't exist
-        create_hdf5_file(hdf5_path)
+        create_hdf5_file(str(self.path))
 
     def __repr__(self) -> str:
         return f"HdfStorage('{self.path}')"
@@ -72,30 +76,85 @@ class HdfStorage(IStorage):
     def __delitem__(self, key: str) -> None:
         """Delete DataFrame and metadata from hdf5 file."""
         self.delete(key)
+    
+    def __iter__(self) -> Iterator[str]:
+        """Iterate over table names."""
+        return iter(self.table_names())
+    
+    def __len__(self) -> int:
+        """Get number of stored tables."""
+        return len(self.table_names())
+    
+    def __contains__(self, key: str) -> bool:
+        """Check if table exists."""
+        return key in self.table_names()
+    
+    def __enter__(self) -> HdfStorage:
+        """Enter context manager."""
+        return self
+    
+    def __exit__(self, exc_type: Optional[Exception], exc_val: Optional[Exception], exc_tb: Optional[object]) -> None:
+        """Exit context manager."""
+        pass
 
-    def store(self, df: DataFrame, table_name: str) -> None:
+    def store(self, df: DataFrame, table_name: str, schema: Optional[str] = None) -> None:
         """Store DataFrame and metadata in hdf5 file."""
-        store_df_hdf5(df, table_name, self.path)
+        store_df_hdf5(df, table_name, str(self.path))
 
-    def load(self, table_name: str) -> DataFrame:
+    def load(self, table_name: str, schema: Optional[str] = None) -> DataFrame:
         """Retrieve DataFrame from hdf5 file."""
-        return load_df_hdf5(table_name, self.path)
+        return load_df_hdf5(table_name, str(self.path))
 
-    def delete(self, table_name: str) -> None:
+    def delete(self, table_name: str, schema: Optional[str] = None) -> None:
         """Delete DataFrame and metadata from hdf5 file."""
-        delete_table_hdf5(table_name, self.path)
+        delete_table_hdf5(table_name, str(self.path))
 
-    def load_metadata(self, table_name: str, schema=None) -> DataFrame:
+    def load_metadata(self, table_name: str, schema: Optional[str] = None) -> DataFrame:
         """Retrieve DataFrame metadata from hdf5 file."""
-        return load_metadata_hdf5(table_name, self.path)
+        return load_metadata_hdf5(table_name, str(self.path))
 
-    def table_names(self) -> List[str]:
+    def table_names(self, schema: Optional[str] = None) -> List[str]:
         """Get list of stored non-metadata table names."""
-        return table_names_hdf5(self.path)
+        return table_names_hdf5(str(self.path))
 
-    def metadata_names(self) -> List[str]:
+    def metadata_names(self, schema: Optional[str] = None) -> List[str]:
         """Get list of stored metadata table names."""
-        return metadata_names_hdf5(self.path)
+        return metadata_names_hdf5(str(self.path))
+    
+    def store_many(self, dataframes: Dict[str, DataFrame], schema: Optional[str] = None) -> None:
+        """Store multiple DataFrames in HDF5 file.
+        
+        Args:
+            dataframes: Dictionary mapping table names to DataFrames
+            schema: Optional schema name (ignored for HDF5)
+        """
+        for table_name, df in dataframes.items():
+            store_df_hdf5(df, table_name, str(self.path))
+    
+    def load_many(self, table_names: List[str], schema: Optional[str] = None) -> Dict[str, DataFrame]:
+        """Load multiple DataFrames from HDF5 file.
+        
+        Args:
+            table_names: List of table names to load
+            schema: Optional schema name (ignored for HDF5)
+            
+        Returns:
+            Dictionary mapping table names to DataFrames
+        """
+        result = {}
+        for table_name in table_names:
+            result[table_name] = self.load(table_name, schema=schema)
+        return result
+    
+    def delete_many(self, table_names: List[str], schema: Optional[str] = None) -> None:
+        """Delete multiple tables from HDF5 file.
+        
+        Args:
+            table_names: List of table names to delete
+            schema: Optional schema name (ignored for HDF5)
+        """
+        for table_name in table_names:
+            delete_table_hdf5(table_name, str(self.path))
 
 
 def create_hdf5_file(path: str) -> None:

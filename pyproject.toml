@@ -1,11 +1,75 @@
 [build-system]
-requires = ["setuptools>=42.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "trashpandas"
+version = "1.0.0"
+description = "Persistent Pandas DataFrame storage and retrieval using a SQL database, HDF5, CSV files, or pickle files."
+authors = [
+    {name = "Odos Matthews", email = "odos@example.com"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["pandas", "dataframe", "storage", "sql", "hdf5", "csv", "pickle"]
+dependencies = [
+    "SQLAlchemy>=2.0.0",
+    "pandas>=1.3.0",
+]
+
+[project.optional-dependencies]
+hdf5 = ["h5py>=3.0.0"]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "mypy>=1.0.0",
+    "ruff>=0.1.0",
+    "tox>=4.0.0",
+    "pre-commit>=3.0.0",
+]
+all = [
+    "trashpandas[hdf5,dev]",
+]
+
+[project.urls]
+Homepage = "https://github.com/eddiethedean/trashpandas"
+Repository = "https://github.com/eddiethedean/trashpandas"
+Issues = "https://github.com/eddiethedean/trashpandas/issues"
+Documentation = "https://github.com/eddiethedean/trashpandas#readme"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+trashpandas = ["py.typed"]
+
 [tool.pytest.ini_options]
-addopts = "--cov=trashpandas"
-testpaths = [
-    "tests",
+addopts = "--cov=trashpandas --cov-report=term-missing --cov-report=xml"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
 ]
 
 [tool.mypy]
@@ -21,3 +85,82 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 no_implicit_reexport = true
+strict = true
+
+[tool.ruff]
+target-version = "py38"
+line-length = 100
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+    "ARG001", # unused-function-args
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "TID", # flake8-tidy-imports
+    "Q",  # flake8-quotes
+    "N",  # pep8-naming
+    "D",  # pydocstyle
+    "S",  # flake8-bandit
+    "BLE", # flake8-blind-except
+    "FBT", # flake8-boolean-trap
+    "A",  # flake8-builtins
+    "COM", # flake8-commas
+    "DTZ", # flake8-datetimez
+    "T20", # flake8-print
+    "PT",  # flake8-pytest-style
+    "Q",  # flake8-quotes
+    "RSE", # flake8-raise
+    "RET", # flake8-return
+    "SLF", # flake8-self
+    "SLOT", # flake8-slots
+    "TCH", # flake8-type-checking
+    "TID", # flake8-tidy-imports
+    "UP", # pyupgrade
+    "YTT", # flake8-2020
+]
+ignore = [
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D105", # Missing docstring in magic method
+    "D107", # Missing docstring in __init__
+    "S101", # Use of assert detected
+    "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "S603", # subprocess call - check for execution of untrusted input
+    "S607", # Starting a process with a partial executable path
+]
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["S101", "S311", "S603", "S607", "D"]
+
+[tool.ruff.isort]
+known-first-party = ["trashpandas"]
+
+[tool.coverage.run]
+source = ["src/trashpandas"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

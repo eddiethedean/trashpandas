@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import pandas as pd
 from pandas import DataFrame
 from pandas.core.dtypes.common import pandas_dtype
 
@@ -6,11 +9,11 @@ def df_metadata(df: DataFrame) -> DataFrame:
     columns = DataFrame({'column': df.columns,
                             'index': False,
                             'datatype': [str(dt) for dt in df.dtypes]})
-    indexes = DataFrame({'column': [f'_no_name_{i}' if name==None else name for i, name in enumerate(df.index.names)],
+    indexes = DataFrame({'column': [f'_no_name_{i}' if name is None else name for i, name in enumerate(df.index.names)],
                             'index': True,
                             'datatype': str(df.index.dtype) if len(df.index.names)==1
                                             else [str(dt) for dt in df.index.dtypes]})  # type: ignore
-    return indexes.append(columns).reset_index(drop=True)
+    return pd.concat([indexes, columns], ignore_index=True)
 
 
 def unname_no_names(df) -> None:
@@ -23,10 +26,10 @@ def unname_no_names(df) -> None:
 
 def name_no_names(df) -> None:
     if len(df.index.names)==1:
-        if df.index.name == None:
+        if df.index.name is None:
             df.index.name = '_no_name'
     else:
-        df.index.names = [f'_no_name_{i}' if name==None else '_no_name_' for i, name in enumerate(df.index.names)]
+        df.index.names = [f'_no_name_{i}' if name is None else name for i, name in enumerate(df.index.names)]
 
         
 def cast_type(series):
