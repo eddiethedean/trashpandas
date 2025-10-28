@@ -318,6 +318,7 @@ def load_metadata_sql(
     table_name: str, engine: Engine, schema: str | None = None,
 ) -> DataFrame:
     """Retrieve DataFrame metadata from database."""
+    validate_schema_name(schema)
     meta_name = f"_{table_name}_metadata"
     return _read_cast_metadata_sql(meta_name, engine, schema=schema)
 
