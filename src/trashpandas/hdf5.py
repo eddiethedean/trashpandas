@@ -47,7 +47,13 @@ import os
 from pathlib import Path
 from typing import Iterator
 
-from h5py import File
+try:
+    from h5py import File
+    H5PY_AVAILABLE = True
+except ImportError:
+    H5PY_AVAILABLE = False
+    File = None
+
 from pandas import DataFrame, read_hdf
 
 from trashpandas.interfaces import IFileStorage
@@ -68,6 +74,10 @@ class HdfStorage(IFileStorage):
 
         DataFrames are stored in this file.
         """
+        if not H5PY_AVAILABLE:
+            raise ImportError(
+                "h5py is required for HDF5 storage. Install it with: pip install h5py",
+            )
         self.path = Path(hdf5_path)
         # create hdf5 file if it doesn't exist
         create_hdf5_file(str(self.path))
