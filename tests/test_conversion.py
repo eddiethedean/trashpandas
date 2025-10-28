@@ -64,7 +64,12 @@ def complex_df():
             "category": ["A", "B", "A", "B"],
         },
         index=pd.MultiIndex.from_tuples(
-            [("2023-01-01", "X"), ("2023-01-01", "Y"), ("2023-01-02", "X"), ("2023-01-02", "Y")],
+            [
+                ("2023-01-01", "X"),
+                ("2023-01-01", "Y"),
+                ("2023-01-02", "X"),
+                ("2023-01-02", "Y"),
+            ],
             names=["date", "region"],
         ),
     )
@@ -676,7 +681,9 @@ class TestPickleConversions:
 class TestComplexDataConversions:
     """Test conversions with complex DataFrames."""
 
-    def test_complex_df_conversion_csv_to_sql(self, complex_df, temp_dir, sqlite_engine):
+    def test_complex_df_conversion_csv_to_sql(
+        self, complex_df, temp_dir, sqlite_engine
+    ):
         """Test converting complex DataFrame from CSV to SQL."""
         csv_storage = CsvStorage(temp_dir)
         csv_storage.store(complex_df, "complex_table")
@@ -687,7 +694,9 @@ class TestComplexDataConversions:
         loaded_df = sql_storage.load("complex_table")
         pd.testing.assert_frame_equal(complex_df, loaded_df)
 
-    def test_complex_df_conversion_sql_to_hdf(self, complex_df, temp_dir, sqlite_engine):
+    def test_complex_df_conversion_sql_to_hdf(
+        self, complex_df, temp_dir, sqlite_engine
+    ):
         """Test converting complex DataFrame from SQL to HDF5."""
         sql_storage = SqlStorage(sqlite_engine)
         sql_storage.store(complex_df, "complex_table")
