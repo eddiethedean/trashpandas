@@ -48,7 +48,7 @@ class TestPickleStorage(unittest.TestCase):
         storage.store(df1, "peoples")
         names = set(storage.table_names())
         expected = {"people", "peoples"}
-        self.assertSetEqual(names, expected)
+        assert names == expected
         delete_all_files(path)
 
 
@@ -108,5 +108,5 @@ class TestPickleFunctions(unittest.TestCase):
         store_df_pickle(df1, "peoples", path)
         names = set(table_names_pickle(path))
         expected = {"people", "peoples"}
-        self.assertSetEqual(names, expected)
+        assert names == expected
         delete_all_files(path)

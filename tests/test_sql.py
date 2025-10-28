@@ -54,7 +54,7 @@ class TestSqlStorage(unittest.TestCase):
         storage.store(df1, "peoples")
         names = set(storage.table_names())
         expected = {"people", "peoples"}
-        self.assertSetEqual(names, expected)
+        assert names == expected
         delete_all_files(path)
 
 
@@ -123,5 +123,5 @@ class TestSql(unittest.TestCase):
         store_df_sql(df1, "peoples", engine)
         names = set(table_names_sql(engine))
         expected = {"people", "peoples"}
-        self.assertSetEqual(names, expected)
+        assert names == expected
         delete_all_files(path)

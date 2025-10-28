@@ -39,5 +39,30 @@ def create_df_string() -> DataFrame:
 
 
 def delete_all_files(path):
+    """Delete all files in a directory, handling Windows file locking issues."""
+    import time
+    import shutil
+    
     for f in os.listdir(path):
-        os.remove(os.path.join(path, f))
+        file_path = os.path.join(path, f)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except (PermissionError, OSError) as e:
+            # On Windows, files might be locked by SQLite connections
+            # Try a few times with small delays
+            for attempt in range(3):
+                time.sleep(0.1)
+                try:
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                    break
+                except (PermissionError, OSError):
+                    if attempt == 2:  # Last attempt
+                        # Log the error but don't fail the test
+                        print(f"Warning: Could not delete {file_path}: {e}")
+                    continue

@@ -25,7 +25,10 @@ def df_metadata(df: DataFrame) -> DataFrame:
             "datatype": (
                 str(df.index.dtype)
                 if len(df.index.names) == 1
-                else [str(df.index.get_level_values(i).dtype) for i in range(len(df.index.names))]
+                else [
+                    str(df.index.get_level_values(i).dtype)
+                    for i in range(len(df.index.names))
+                ]
             ),
         },
     )

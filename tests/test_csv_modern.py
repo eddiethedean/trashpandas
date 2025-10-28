@@ -66,14 +66,18 @@ class TestCsvStorage:
 
         pd.testing.assert_frame_equal(sample_df, loaded_df)
 
-    def test_dictionary_interface(self, csv_storage: CsvStorage, sample_df: pd.DataFrame):
+    def test_dictionary_interface(
+        self, csv_storage: CsvStorage, sample_df: pd.DataFrame
+    ):
         """Test dictionary-like interface."""
         csv_storage["people"] = sample_df
         loaded_df = csv_storage["people"]
 
         pd.testing.assert_frame_equal(sample_df, loaded_df)
 
-    def test_delete_table(self, csv_storage: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path):
+    def test_delete_table(
+        self, csv_storage: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path
+    ):
         """Test deleting a table."""
         csv_storage.store(sample_df, "people")
         csv_storage.delete("people")
@@ -84,7 +88,9 @@ class TestCsvStorage:
         assert not csv_file.exists()
         assert not metadata_file.exists()
 
-    def test_delete_with_del_operator(self, csv_storage: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path):
+    def test_delete_with_del_operator(
+        self, csv_storage: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path
+    ):
         """Test deleting a table using del operator."""
         csv_storage["people"] = sample_df
         del csv_storage["people"]
@@ -287,5 +293,7 @@ def test_delete_with_compression():
         assert "test_data" not in storage.table_names()
 
         # Verify compressed files are deleted
-        assert not csv_file.exists() and not csv_file_gz.exists(), "CSV should be deleted"
-        assert not metadata_file.exists() and not metadata_file_gz.exists(), "Metadata should be deleted"
+        assert not csv_file.exists(), "CSV file should be deleted"
+        assert not csv_file_gz.exists(), "Compressed CSV file should be deleted"
+        assert not metadata_file.exists(), "Metadata file should be deleted"
+        assert not metadata_file_gz.exists(), "Compressed metadata file should be deleted"

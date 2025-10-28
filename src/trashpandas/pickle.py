@@ -269,8 +269,7 @@ def load_df_pickle(
     compression_literal = cast(
         "Optional[Literal['infer', 'gzip', 'bz2', 'xz', 'zstd']]", compression,
     )
-    df = _safe_read_pickle(pickle_path, compression_literal)
-    return df
+    return _safe_read_pickle(pickle_path, compression_literal)
 
 
 def delete_table_pickle(

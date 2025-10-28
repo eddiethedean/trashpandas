@@ -389,7 +389,11 @@ async def load_df_csv_async(
         compression_literal = cast(
             "Optional[Literal['infer', 'gzip', 'bz2', 'xz', 'zstd']]", compression,
         )
-        df = read_csv(csv_path, compression=compression_literal).astype(types).set_index(indexes)
+        df = (
+            read_csv(csv_path, compression=compression_literal)
+            .astype(types)
+            .set_index(indexes)
+        )
         unname_no_names(df)
         return df
 
