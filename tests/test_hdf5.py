@@ -319,9 +319,10 @@ class TestHdfErrorHandling:
 
     def test_h5py_import_error(self):
         """Test ImportError when h5py is not available."""
-        with patch("trashpandas.hdf5.H5PY_AVAILABLE", False):
-            with pytest.raises(ImportError, match="h5py is required"):
-                HdfStorage("test.h5")
+        with patch("trashpandas.hdf5.H5PY_AVAILABLE", False), pytest.raises(
+            ImportError, match="h5py is required",
+        ):
+            HdfStorage("test.h5")
 
     def test_create_hdf5_file_function(self, temp_dir):
         """Test create_hdf5_file helper function."""
