@@ -163,7 +163,9 @@ class TestCsvStorage:
         csv_storage.delete_many(table_names)
         assert len(csv_storage) == 0
 
-    def test_compression_support(self, csv_storage_compressed: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path):
+    def test_compression_support(
+        self, csv_storage_compressed: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path,
+    ):
         """Test compression support."""
         csv_storage_compressed.store(sample_df, "people")
 
@@ -177,7 +179,9 @@ class TestCsvStorage:
         loaded_df = csv_storage_compressed.load("people")
         pd.testing.assert_frame_equal(sample_df, loaded_df)
 
-    def test_named_index_preservation(self, csv_storage: CsvStorage, named_index_df: pd.DataFrame):
+    def test_named_index_preservation(
+        self, csv_storage: CsvStorage, named_index_df: pd.DataFrame,
+    ):
         """Test that named indexes are preserved."""
         csv_storage.store(named_index_df, "data")
         loaded_df = csv_storage.load("data")
@@ -246,7 +250,7 @@ class TestCsvFunctions:
 
 
 @pytest.mark.parametrize("compression", [None, "gzip", "bz2", "xz"])
-def test_compression_types(compression):
+    def test_compression_types(compression):
     """Test different compression types."""
     with tempfile.TemporaryDirectory() as tmpdir:
         storage = CsvStorage(tmpdir, compression=compression)

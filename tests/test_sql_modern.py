@@ -26,7 +26,7 @@ def temp_dir() -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def sqlite_engine(temp_dir: Path):
+def sqlite_engine():
     """Create a SQLite engine for testing using in-memory database."""
     engine = create_engine("sqlite:///:memory:")
     yield engine
@@ -231,8 +231,6 @@ class TestSqlStorage:
 
     def test_nonexistent_table_error(self, storage: SqlStorage):
         """Test error handling for nonexistent tables."""
-        from trashpandas.exceptions import ValidationError
-        
         with pytest.raises(ValueError, match="Table.*not found"):
             storage.load("nonexistent_table")
 
@@ -367,6 +365,8 @@ class TestSecurity:
         malicious_query = (
             "__import__('os').system('touch /tmp/trashpandas_security_test.tmp')"
         )
+
+        from trashpandas.exceptions import ValidationError
 
         try:
             # The new implementation should reject this as dangerous SQL

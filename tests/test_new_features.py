@@ -33,7 +33,7 @@ def temp_dir() -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def sqlite_engine(temp_dir: Path):
+def sqlite_engine():
     """Create a SQLite engine for testing using in-memory database."""
     engine = create_engine("sqlite:///:memory:")
     yield engine

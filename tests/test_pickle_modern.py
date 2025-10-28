@@ -70,14 +70,18 @@ class TestPickleStorage:
 
         pd.testing.assert_frame_equal(sample_df, loaded_df)
 
-    def test_dictionary_interface(self, pickle_storage: PickleStorage, sample_df: pd.DataFrame):
+    def test_dictionary_interface(
+        self, pickle_storage: PickleStorage, sample_df: pd.DataFrame,
+    ):
         """Test dictionary-like interface."""
         pickle_storage["people"] = sample_df
         loaded_df = pickle_storage["people"]
 
         pd.testing.assert_frame_equal(sample_df, loaded_df)
 
-    def test_delete_table(self, pickle_storage: PickleStorage, sample_df: pd.DataFrame, temp_dir: Path):
+    def test_delete_table(
+        self, pickle_storage: PickleStorage, sample_df: pd.DataFrame, temp_dir: Path,
+    ):
         """Test deleting a table."""
         pickle_storage.store(sample_df, "people")
         pickle_storage.delete("people")
@@ -86,7 +90,9 @@ class TestPickleStorage:
         pickle_file = temp_dir / "people.pickle"
         assert not pickle_file.exists()
 
-    def test_delete_with_del_operator(self, pickle_storage: PickleStorage, sample_df: pd.DataFrame, temp_dir: Path):
+    def test_delete_with_del_operator(
+        self, pickle_storage: PickleStorage, sample_df: pd.DataFrame, temp_dir: Path,
+    ):
         """Test deleting a table using del operator."""
         pickle_storage["people"] = sample_df
         del pickle_storage["people"]
@@ -95,7 +101,9 @@ class TestPickleStorage:
         pickle_file = temp_dir / "people.pickle"
         assert not pickle_file.exists()
 
-    def test_table_names(self, pickle_storage: PickleStorage, sample_df: pd.DataFrame):
+    def test_table_names(
+        self, pickle_storage: PickleStorage, sample_df: pd.DataFrame,
+    ):
         """Test getting table names."""
         pickle_storage.store(sample_df, "people")
         pickle_storage.store(sample_df, "users")
@@ -111,7 +119,9 @@ class TestPickleStorage:
             loaded_df = storage["people"]
             pd.testing.assert_frame_equal(sample_df, loaded_df)
 
-    def test_iterator_protocol(self, pickle_storage: PickleStorage, sample_df: pd.DataFrame):
+    def test_iterator_protocol(
+        self, pickle_storage: PickleStorage, sample_df: pd.DataFrame,
+    ):
         """Test iterator protocol."""
         pickle_storage.store(sample_df, "people")
         pickle_storage.store(sample_df, "users")
@@ -128,7 +138,9 @@ class TestPickleStorage:
         assert "users" in pickle_storage
         assert "nonexistent" not in pickle_storage
 
-    def test_bulk_operations(self, pickle_storage: PickleStorage, sample_df: pd.DataFrame):
+    def test_bulk_operations(
+        self, pickle_storage: PickleStorage, sample_df: pd.DataFrame,
+    ):
         """Test bulk operations."""
         # Store multiple DataFrames
         dataframes = {
@@ -150,7 +162,9 @@ class TestPickleStorage:
         pickle_storage.delete_many(table_names)
         assert len(pickle_storage) == 0
 
-    def test_compression_support(self, pickle_storage_compressed: PickleStorage, sample_df: pd.DataFrame, temp_dir: Path):
+    def test_compression_support(
+        self, pickle_storage_compressed: PickleStorage, sample_df: pd.DataFrame, temp_dir: Path,
+    ):
         """Test compression support."""
         pickle_storage_compressed.store(sample_df, "people")
 
@@ -175,7 +189,9 @@ class TestPickleStorage:
         loaded_df = storage.load("people")
         pd.testing.assert_frame_equal(sample_df, loaded_df)
 
-    def test_complex_data_preservation(self, pickle_storage: PickleStorage, complex_df: pd.DataFrame):
+    def test_complex_data_preservation(
+        self, pickle_storage: PickleStorage, complex_df: pd.DataFrame,
+    ):
         """Test that complex data types are preserved."""
         pickle_storage.store(complex_df, "complex_data")
         loaded_df = pickle_storage.load("complex_data")
@@ -186,7 +202,9 @@ class TestPickleStorage:
         assert loaded_df["bool"].dtype == complex_df["bool"].dtype
         assert loaded_df["datetime"].dtype == complex_df["datetime"].dtype
 
-    def test_named_index_preservation(self, pickle_storage: PickleStorage, complex_df: pd.DataFrame):
+    def test_named_index_preservation(
+        self, pickle_storage: PickleStorage, complex_df: pd.DataFrame,
+    ):
         """Test that named indexes are preserved."""
         pickle_storage.store(complex_df, "data")
         loaded_df = pickle_storage.load("data")
