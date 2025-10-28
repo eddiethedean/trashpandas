@@ -349,7 +349,9 @@ class TestBulkOperationsEdgeCases:
         # Empty delete_many
         storage.delete_many([])
 
-    def test_bulk_operations_with_single_item(self, temp_dir: Path, sample_df: pd.DataFrame):
+    def test_bulk_operations_with_single_item(
+        self, temp_dir: Path, sample_df: pd.DataFrame,
+    ):
         """Test bulk operations with single item."""
         storage = CsvStorage(temp_dir)
 
@@ -365,7 +367,9 @@ class TestBulkOperationsEdgeCases:
         storage.delete_many(["single"])
         assert len(storage) == 0
 
-    def test_bulk_operations_with_duplicate_names(self, temp_dir: Path, sample_df: pd.DataFrame):
+    def test_bulk_operations_with_duplicate_names(
+        self, temp_dir: Path, sample_df: pd.DataFrame,
+    ):
         """Test bulk operations with duplicate names."""
         storage = CsvStorage(temp_dir)
 

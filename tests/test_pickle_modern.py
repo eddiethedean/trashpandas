@@ -63,7 +63,9 @@ def complex_df() -> pd.DataFrame:
 class TestPickleStorage:
     """Test cases for PickleStorage class."""
 
-    def test_store_and_load(self, pickle_storage: PickleStorage, sample_df: pd.DataFrame):
+    def test_store_and_load(
+        self, pickle_storage: PickleStorage, sample_df: pd.DataFrame,
+    ):
         """Test storing and loading a DataFrame."""
         pickle_storage.store(sample_df, "people")
         loaded_df = pickle_storage.load("people")
@@ -163,7 +165,10 @@ class TestPickleStorage:
         assert len(pickle_storage) == 0
 
     def test_compression_support(
-        self, pickle_storage_compressed: PickleStorage, sample_df: pd.DataFrame, temp_dir: Path,
+        self,
+        pickle_storage_compressed: PickleStorage,
+        sample_df: pd.DataFrame,
+        temp_dir: Path,
     ):
         """Test compression support."""
         pickle_storage_compressed.store(sample_df, "people")

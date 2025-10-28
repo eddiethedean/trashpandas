@@ -66,5 +66,7 @@ def delete_all_files(path):
                         # Log the error but don't fail the test
                         # Using warnings module instead of print
                         import warnings
-                        warnings.warn(f"Could not delete {file_path}: {e}", stacklevel=2)
+                        warnings.warn(
+                            f"Could not delete {file_path}: {e}", stacklevel=2,
+                        )
                     continue

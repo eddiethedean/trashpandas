@@ -91,7 +91,9 @@ class TestSqlStorage:
 
         pd.testing.assert_frame_equal(sample_df, loaded_df)
 
-    def test_delete_table(self, storage: SqlStorage, sample_df: pd.DataFrame, sqlite_engine):
+    def test_delete_table(
+        self, storage: SqlStorage, sample_df: pd.DataFrame, sqlite_engine,
+    ):
         """Test deleting a table."""
         storage.store(sample_df, "people")
         storage.delete("people")
@@ -351,7 +353,10 @@ class TestSecurity:
     def test_query_prevents_code_injection_via_pandas_query(
         self, storage: SqlStorage, sample_df: pd.DataFrame,
     ):
-        """Test that the new implementation prevents code injection via DataFrame.query()."""
+        """Test that the new implementation prevents code injection.
+
+        This test verifies that DataFrame.query() code injection is prevented.
+        """
 
         # Create a file to detect code execution
         test_file = "/tmp/trashpandas_security_test.tmp"  # noqa: S108

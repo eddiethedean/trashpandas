@@ -164,7 +164,10 @@ class TestCsvStorage:
         assert len(csv_storage) == 0
 
     def test_compression_support(
-        self, csv_storage_compressed: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path,
+        self,
+        csv_storage_compressed: CsvStorage,
+        sample_df: pd.DataFrame,
+        temp_dir: Path,
     ):
         """Test compression support."""
         csv_storage_compressed.store(sample_df, "people")
@@ -250,7 +253,7 @@ class TestCsvFunctions:
 
 
 @pytest.mark.parametrize("compression", [None, "gzip", "bz2", "xz"])
-    def test_compression_types(compression):
+def test_compression_types(compression):
     """Test different compression types."""
     with tempfile.TemporaryDirectory() as tmpdir:
         storage = CsvStorage(tmpdir, compression=compression)
@@ -289,8 +292,12 @@ def test_delete_with_compression():
         metadata_file = temp_dir / "_test_data_metadata.csv.gzip"
         metadata_file_gz = temp_dir / "_test_data_metadata.csv.gz"
 
-        assert csv_file.exists() or csv_file_gz.exists(), "Compressed CSV should exist"
-        assert metadata_file.exists() or metadata_file_gz.exists(), "Compressed metadata should exist"
+        assert (
+            csv_file.exists() or csv_file_gz.exists()
+        ), "Compressed CSV should exist"
+        assert (
+            metadata_file.exists() or metadata_file_gz.exists()
+        ), "Compressed metadata should exist"
 
         # Delete should work with compression
         storage.delete("test_data")
@@ -298,6 +305,10 @@ def test_delete_with_compression():
 
         # Verify compressed files are deleted
         assert not csv_file.exists(), "CSV file should be deleted"
-        assert not csv_file_gz.exists(), "Compressed CSV file should be deleted"
+        assert not csv_file_gz.exists(), (
+            "Compressed CSV file should be deleted"
+        )
         assert not metadata_file.exists(), "Metadata file should be deleted"
-        assert not metadata_file_gz.exists(), "Compressed metadata file should be deleted"
+        assert not metadata_file_gz.exists(), (
+            "Compressed metadata file should be deleted"
+        )
