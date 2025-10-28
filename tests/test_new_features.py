@@ -411,7 +411,7 @@ class TestMetadataModule:
         # Test with complex metadata
         df = pd.DataFrame({"col1": [1, 2], "col2": ["a", "b"]})
         metadata = TableMetadata.from_dataframe(df, "test_table")
-        
+
         # Test that we can recreate the DataFrame structure
         assert metadata.table_name == "test_table"
         assert metadata.columns == ["col1", "col2"]
@@ -429,7 +429,7 @@ class TestMetadataModule:
             "float_col": [1.1, 2.2, 3.3],
         })
         metadata = TableMetadata.from_dataframe(df, "test_table")
-        
+
         # Verify all column types are captured
         assert len(metadata.columns) == 3
         assert "int_col" in metadata.column_types
@@ -467,7 +467,7 @@ class TestInterfacesModule:
         assert hasattr(IStorage, "load")
         assert hasattr(IStorage, "delete")
         assert hasattr(IStorage, "table_names")
-        
+
         # Test that these are abstract methods
         import inspect
         assert inspect.isabstract(IStorage)
@@ -481,7 +481,7 @@ class TestInterfacesModule:
         assert hasattr(IFileStorage, "load")
         assert hasattr(IFileStorage, "delete")
         assert hasattr(IFileStorage, "table_names")
-        
+
         # Test that these are abstract methods
         import inspect
         assert inspect.isabstract(IFileStorage)
@@ -495,7 +495,7 @@ class TestInterfacesModule:
         assert hasattr(IAsyncStorage, "load")
         assert hasattr(IAsyncStorage, "delete")
         assert hasattr(IAsyncStorage, "table_names")
-        
+
         # Test that these are abstract methods
         import inspect
         assert inspect.isabstract(IAsyncStorage)
@@ -509,7 +509,7 @@ class TestInterfacesModule:
         assert hasattr(IAsyncFileStorage, "load")
         assert hasattr(IAsyncFileStorage, "delete")
         assert hasattr(IAsyncFileStorage, "table_names")
-        
+
         # Test that these are abstract methods
         import inspect
         assert inspect.isabstract(IAsyncFileStorage)

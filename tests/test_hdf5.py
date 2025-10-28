@@ -7,6 +7,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
+from trashpandas.exceptions import ValidationError
 from trashpandas.hdf5 import (
     HdfStorage,
     create_hdf5_file,
@@ -47,7 +48,12 @@ def complex_df():
             "category": ["A", "B", "A", "B"],
         },
         index=pd.MultiIndex.from_tuples(
-            [("2023-01-01", "X"), ("2023-01-01", "Y"), ("2023-01-02", "X"), ("2023-01-02", "Y")],
+            [
+                ("2023-01-01", "X"),
+                ("2023-01-01", "Y"),
+                ("2023-01-02", "X"),
+                ("2023-01-02", "Y"),
+            ],
             names=["date", "region"],
         ),
     )
@@ -73,7 +79,7 @@ class TestHdfStorageInit:
         hdf_path = temp_dir / "test.h5"
         assert not hdf_path.exists()
 
-        storage = HdfStorage(hdf_path)
+        HdfStorage(hdf_path)
         assert hdf_path.exists()
 
     def test_init_with_existing_file(self, temp_dir):
@@ -201,7 +207,7 @@ class TestHdfStorageMetadata:
                 "float_col": [1.1, 2.2, 3.3],
                 "str_col": ["a", "b", "c"],
                 "bool_col": [True, False, True],
-            }
+            },
         )
         hdf_storage.store(df, "test_table")
         loaded_df = hdf_storage.load("test_table")
@@ -319,9 +325,10 @@ class TestHdfErrorHandling:
 
     def test_h5py_import_error(self):
         """Test ImportError when h5py is not available."""
-        with patch("trashpandas.hdf5.H5PY_AVAILABLE", False):
-            with pytest.raises(ImportError, match="h5py is required"):
-                HdfStorage("test.h5")
+        with patch("trashpandas.hdf5.H5PY_AVAILABLE", False), pytest.raises(
+            ImportError, match="h5py is required"
+        ):
+            HdfStorage("test.h5")
 
     def test_create_hdf5_file_function(self, temp_dir):
         """Test create_hdf5_file helper function."""
@@ -333,10 +340,10 @@ class TestHdfErrorHandling:
 
     def test_invalid_table_name(self, hdf_storage, sample_df):
         """Test validation of table names."""
-        with pytest.raises(Exception):  # Should raise ValidationError
+        with pytest.raises(ValidationError):
             hdf_storage.store(sample_df, "")
 
-        with pytest.raises(Exception):  # Should raise ValidationError
+        with pytest.raises(ValidationError):
             hdf_storage.store(sample_df, None)
 
 
@@ -378,7 +385,7 @@ class TestHdfStorageAdvanced:
                 "a": [1, 2, None],
                 "b": [1.1, None, 3.3],
                 "c": ["x", None, "z"],
-            }
+            },
         )
         hdf_storage.store(df, "nan_table")
         loaded_df = hdf_storage.load("nan_table")
@@ -391,7 +398,7 @@ class TestHdfStorageAdvanced:
             {
                 "date": pd.date_range("2023-01-01", periods=3),
                 "value": [1, 2, 3],
-            }
+            },
         )
         hdf_storage.store(df, "datetime_table")
         loaded_df = hdf_storage.load("datetime_table")

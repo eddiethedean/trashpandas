@@ -8,6 +8,7 @@ import pytest
 from sqlalchemy import create_engine
 
 from trashpandas.csv import CsvStorage, load_metadata_csv
+from trashpandas.exceptions import ValidationError
 from trashpandas.sql import SqlStorage
 
 
@@ -96,7 +97,7 @@ class TestSqlRemainingCoverage:
         assert "test_table" in storage.table_names()
 
         # Test with empty string schema (should raise ValidationError)
-        with pytest.raises(Exception):  # ValidationError for empty schema
+        with pytest.raises(ValidationError):
             storage.store(df, "test_table2", schema="")
 
     def test_query_edge_cases(self, sqlite_engine):
@@ -124,7 +125,7 @@ class TestSqlRemainingCoverage:
         assert isinstance(metadata, pd.DataFrame)
 
         # Test load_metadata with empty schema (should raise ValidationError)
-        with pytest.raises(Exception):  # ValidationError for empty schema
+        with pytest.raises(ValidationError):
             storage.load_metadata("test_table", schema="")
 
     def test_connection_edge_cases(self, sqlite_engine):
