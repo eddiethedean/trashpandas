@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "trashpandas"
-version = "1.0.0"
+version = "1.0.1"
 description = "Persistent Pandas DataFrame storage and retrieval using a SQL database, HDF5, CSV files, or pickle files."
 authors = [
     {name = "Odos Matthews", email = "odos@example.com"}
