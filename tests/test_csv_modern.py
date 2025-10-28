@@ -67,7 +67,7 @@ class TestCsvStorage:
         pd.testing.assert_frame_equal(sample_df, loaded_df)
 
     def test_dictionary_interface(
-        self, csv_storage: CsvStorage, sample_df: pd.DataFrame
+        self, csv_storage: CsvStorage, sample_df: pd.DataFrame,
     ):
         """Test dictionary-like interface."""
         csv_storage["people"] = sample_df
@@ -76,7 +76,7 @@ class TestCsvStorage:
         pd.testing.assert_frame_equal(sample_df, loaded_df)
 
     def test_delete_table(
-        self, csv_storage: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path
+        self, csv_storage: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path,
     ):
         """Test deleting a table."""
         csv_storage.store(sample_df, "people")
@@ -89,7 +89,7 @@ class TestCsvStorage:
         assert not metadata_file.exists()
 
     def test_delete_with_del_operator(
-        self, csv_storage: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path
+        self, csv_storage: CsvStorage, sample_df: pd.DataFrame, temp_dir: Path,
     ):
         """Test deleting a table using del operator."""
         csv_storage["people"] = sample_df

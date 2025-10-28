@@ -40,9 +40,9 @@ def create_df_string() -> DataFrame:
 
 def delete_all_files(path):
     """Delete all files in a directory, handling Windows file locking issues."""
-    import time
     import shutil
-    
+    import time
+
     for f in os.listdir(path):
         file_path = os.path.join(path, f)
         try:
@@ -64,5 +64,7 @@ def delete_all_files(path):
                 except (PermissionError, OSError):
                     if attempt == 2:  # Last attempt
                         # Log the error but don't fail the test
-                        print(f"Warning: Could not delete {file_path}: {e}")
+                        # Using warnings module instead of print
+                        import warnings
+                        warnings.warn(f"Could not delete {file_path}: {e}", stacklevel=2)
                     continue

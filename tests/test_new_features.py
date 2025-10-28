@@ -34,9 +34,8 @@ def temp_dir() -> Generator[Path, None, None]:
 
 @pytest.fixture
 def sqlite_engine(temp_dir: Path):
-    """Create a SQLite engine for testing."""
-    db_path = temp_dir / "test.db"
-    engine = create_engine(f"sqlite:///{db_path}")
+    """Create a SQLite engine for testing using in-memory database."""
+    engine = create_engine("sqlite:///:memory:")
     yield engine
     engine.dispose()
 

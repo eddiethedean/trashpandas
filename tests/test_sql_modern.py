@@ -27,9 +27,8 @@ def temp_dir() -> Generator[Path, None, None]:
 
 @pytest.fixture
 def sqlite_engine(temp_dir: Path):
-    """Create a SQLite engine for testing."""
-    db_path = temp_dir / "test.db"
-    engine = create_engine(f"sqlite:///{db_path}")
+    """Create a SQLite engine for testing using in-memory database."""
+    engine = create_engine("sqlite:///:memory:")
     yield engine
     engine.dispose()
 
@@ -226,7 +225,9 @@ class TestSqlStorage:
 
     def test_nonexistent_table_error(self, storage: SqlStorage):
         """Test error handling for nonexistent tables."""
-        with pytest.raises(Exception):  # Should raise some kind of error
+        from trashpandas.exceptions import ValidationError
+        
+        with pytest.raises(ValidationError, match="Table.*not found"):
             storage.load("nonexistent_table")
 
 
@@ -355,8 +356,8 @@ class TestSecurity:
             # If we get here, the query was executed but shouldn't have been
             # In the best case, it would have been rejected as invalid SQL
             assert not os.path.exists(test_file), "Security test failed - code was executed!"
-        except Exception:
-            # This is expected - the query should fail
+        except (ValidationError, ValueError, TypeError):
+            # This is expected - the query should fail with a specific error
             pass
         finally:
             if os.path.exists(test_file):

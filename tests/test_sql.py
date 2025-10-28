@@ -25,7 +25,7 @@ path = os.getcwd() + "/tests/data"
 class TestSqlStorage(unittest.TestCase):
     def test_store_load(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         storage = SqlStorage(engine)
         df1 = create_df()
         storage.store(df1, "people")
@@ -35,7 +35,7 @@ class TestSqlStorage(unittest.TestCase):
 
     def test_delete(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         storage = SqlStorage(engine)
         df1 = create_df()
         storage.store(df1, "people")
@@ -47,7 +47,7 @@ class TestSqlStorage(unittest.TestCase):
 
     def test_table_names(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         storage = SqlStorage(engine)
         df1 = create_df()
         storage.store(df1, "people")
@@ -61,7 +61,7 @@ class TestSqlStorage(unittest.TestCase):
 class TestSql(unittest.TestCase):
     def test_basic_store_load(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         df1 = create_df()
         store_df_sql(df1, "people", engine)
         df2 = load_df_sql("people", engine)
@@ -70,7 +70,7 @@ class TestSql(unittest.TestCase):
 
     def test_named_store_load(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         df1 = create_named_index_df()
         store_df_sql(df1, "people", engine)
         df2 = load_df_sql("people", engine)
@@ -79,7 +79,7 @@ class TestSql(unittest.TestCase):
 
     def test_two_unnamed_store_load(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         df1 = create_two_unnamed_index_df()
         store_df_sql(df1, "people", engine)
         df2 = load_df_sql("people", engine)
@@ -88,7 +88,7 @@ class TestSql(unittest.TestCase):
 
     def test_one_named_store_load(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         df1 = create_two_index_one_named_df()
         store_df_sql(df1, "people", engine)
         df2 = load_df_sql("people", engine)
@@ -97,7 +97,7 @@ class TestSql(unittest.TestCase):
 
     def test_string_store_load(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         df1 = create_df_string()
         store_df_sql(df1, "people", engine)
         df2 = load_df_sql("people", engine)
@@ -106,7 +106,7 @@ class TestSql(unittest.TestCase):
 
     def test_delete_table(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         df1 = create_df()
         store_df_sql(df1, "people", engine)
         delete_table_sql("people", engine)
@@ -117,7 +117,7 @@ class TestSql(unittest.TestCase):
 
     def test_table_names(self):
         delete_all_files(path)
-        engine = create_engine(f"sqlite:///{path}/test.db")
+        engine = create_engine("sqlite:///:memory:")
         df1 = create_df()
         store_df_sql(df1, "people", engine)
         store_df_sql(df1, "peoples", engine)

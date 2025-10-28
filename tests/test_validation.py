@@ -202,8 +202,7 @@ class TestIntegrationWithStorage:
         from trashpandas.sql import SqlStorage
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            db_path = Path(tmpdir) / "test.db"
-            storage = SqlStorage(f"sqlite:///{db_path}")
+            storage = SqlStorage("sqlite:///:memory:")
             df = pd.DataFrame({"a": [1, 2, 3]})
 
             # Valid name should work
@@ -264,8 +263,7 @@ class TestIntegrationWithStorage:
         from trashpandas.sql import SqlStorage
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            db_path = Path(tmpdir) / "test.db"
-            storage = SqlStorage(f"sqlite:///{db_path}")
+            storage = SqlStorage("sqlite:///:memory:")
 
             # Invalid names should raise ValidationError even for load
             with pytest.raises(ValidationError):
