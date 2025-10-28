@@ -197,11 +197,10 @@ class TestIntegrationWithStorage:
     def test_sql_storage_validates_table_names(self):
         """Test that SqlStorage validates table names."""
         import tempfile
-        from pathlib import Path
 
         from trashpandas.sql import SqlStorage
 
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory():
             storage = SqlStorage("sqlite:///:memory:")
             df = pd.DataFrame({"a": [1, 2, 3]})
 
@@ -258,11 +257,10 @@ class TestIntegrationWithStorage:
     def test_load_validates_table_names(self):
         """Test that load operations also validate table names."""
         import tempfile
-        from pathlib import Path
 
         from trashpandas.sql import SqlStorage
 
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory():
             storage = SqlStorage("sqlite:///:memory:")
 
             # Invalid names should raise ValidationError even for load

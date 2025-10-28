@@ -100,7 +100,9 @@ class TestSqlStorage:
         assert "people" not in table_names
         assert "_people_metadata" not in table_names
 
-    def test_delete_with_del_operator(self, storage: SqlStorage, sample_df: pd.DataFrame, sqlite_engine):
+    def test_delete_with_del_operator(
+        self, storage: SqlStorage, sample_df: pd.DataFrame, sqlite_engine,
+    ):
         """Test deleting a table using del operator."""
         storage["people"] = sample_df
         del storage["people"]
@@ -193,7 +195,9 @@ class TestSqlStorage:
         result = storage.query("people", limit=2)
         assert len(result) == 2
 
-    def test_named_index_preservation(self, storage: SqlStorage, named_index_df: pd.DataFrame):
+    def test_named_index_preservation(
+        self, storage: SqlStorage, named_index_df: pd.DataFrame,
+    ):
         """Test that named indexes are preserved."""
         storage.store(named_index_df, "data")
         loaded_df = storage.load("data")
@@ -201,7 +205,9 @@ class TestSqlStorage:
         pd.testing.assert_frame_equal(named_index_df, loaded_df)
         assert loaded_df.index.name == named_index_df.index.name
 
-    def test_multi_index_preservation(self, storage: SqlStorage, multi_index_df: pd.DataFrame):
+    def test_multi_index_preservation(
+        self, storage: SqlStorage, multi_index_df: pd.DataFrame,
+    ):
         """Test that multi-indexes are preserved."""
         storage.store(multi_index_df, "data")
         loaded_df = storage.load("data")
@@ -227,7 +233,7 @@ class TestSqlStorage:
         """Test error handling for nonexistent tables."""
         from trashpandas.exceptions import ValidationError
         
-        with pytest.raises(ValidationError, match="Table.*not found"):
+        with pytest.raises(ValueError, match="Table.*not found"):
             storage.load("nonexistent_table")
 
 
@@ -279,7 +285,9 @@ async def test_async_operations():
 class TestSecurity:
     """Test security features and SQL injection prevention."""
 
-    def test_query_with_valid_where_clause(self, storage: SqlStorage, sample_df: pd.DataFrame):
+    def test_query_with_valid_where_clause(
+        self, storage: SqlStorage, sample_df: pd.DataFrame,
+    ):
         """Test that valid WHERE clauses work correctly."""
         storage.store(sample_df, "test_table")
 
@@ -288,7 +296,9 @@ class TestSecurity:
         assert len(result) > 0
         assert all(result["age"] > 25)
 
-    def test_query_with_sql_injection_detection(self, storage: SqlStorage, sample_df: pd.DataFrame):
+    def test_query_with_sql_injection_detection(
+        self, storage: SqlStorage, sample_df: pd.DataFrame,
+    ):
         """Test that SQL injection attempts are detected and rejected."""
         from trashpandas.exceptions import ValidationError
 
@@ -309,7 +319,9 @@ class TestSecurity:
 
             assert "WHERE clause contains dangerous SQL patterns" in str(exc_info.value)
 
-    def test_query_with_invalid_column_names(self, storage: SqlStorage, sample_df: pd.DataFrame):
+    def test_query_with_invalid_column_names(
+        self, storage: SqlStorage, sample_df: pd.DataFrame,
+    ):
         """Test that invalid column names are rejected."""
         from trashpandas.exceptions import ValidationError
 
@@ -328,7 +340,9 @@ class TestSecurity:
 
             assert "Invalid characters in column name" in str(exc_info.value)
 
-    def test_query_with_valid_column_names(self, storage: SqlStorage, sample_df: pd.DataFrame):
+    def test_query_with_valid_column_names(
+        self, storage: SqlStorage, sample_df: pd.DataFrame,
+    ):
         """Test that valid column names work correctly."""
         storage.store(sample_df, "test_table")
 
@@ -336,11 +350,13 @@ class TestSecurity:
         result = storage.query("test_table", columns=["name", "age"])
         assert list(result.columns) == ["name", "age"]
 
-    def test_query_prevents_code_injection_via_pandas_query(self, storage: SqlStorage, sample_df: pd.DataFrame):
+    def test_query_prevents_code_injection_via_pandas_query(
+        self, storage: SqlStorage, sample_df: pd.DataFrame,
+    ):
         """Test that the new implementation prevents code injection via DataFrame.query()."""
 
         # Create a file to detect code execution
-        test_file = "/tmp/trashpandas_security_test.tmp"
+        test_file = "/tmp/trashpandas_security_test.tmp"  # noqa: S108
         if os.path.exists(test_file):
             os.remove(test_file)
 
@@ -348,22 +364,28 @@ class TestSecurity:
 
         # Attempt code execution via pandas query syntax (should fail)
         # Note: The old implementation allowed this, the new one uses SQL directly
-        malicious_query = "__import__('os').system('touch /tmp/trashpandas_security_test.tmp')"
+        malicious_query = (
+            "__import__('os').system('touch /tmp/trashpandas_security_test.tmp')"
+        )
 
         try:
             # The new implementation should reject this as dangerous SQL
             storage.query("test_table", where_clause=malicious_query)
             # If we get here, the query was executed but shouldn't have been
             # In the best case, it would have been rejected as invalid SQL
-            assert not os.path.exists(test_file), "Security test failed - code was executed!"
-        except (ValidationError, ValueError, TypeError):
+            assert not os.path.exists(test_file), (
+                "Security test failed - code was executed!"
+            )
+        except ValidationError:
             # This is expected - the query should fail with a specific error
             pass
         finally:
             if os.path.exists(test_file):
                 os.remove(test_file)
 
-    def test_query_preserves_metadata_and_types(self, storage: SqlStorage, sample_df: pd.DataFrame):
+    def test_query_preserves_metadata_and_types(
+        self, storage: SqlStorage, sample_df: pd.DataFrame,
+    ):
         """Test that queries preserve DataFrame metadata and types."""
         storage.store(sample_df, "test_table")
 
