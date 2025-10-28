@@ -19,7 +19,7 @@ from trashpandas.exceptions import (
     MetadataError,
     MetadataNotFoundError,
     MetadataCorruptedError,
-    ConnectionError,
+    StorageConnectionError,
     ValidationError,
     ConversionError,
     CompressionError,
@@ -99,8 +99,8 @@ class TestExceptionHierarchy:
         assert "Invalid format" in str(error)
 
     def test_connection_error(self):
-        """Test ConnectionError."""
-        error = ConnectionError("sql", "Connection failed")
+        """Test StorageConnectionError."""
+        error = StorageConnectionError("sql", "Connection failed")
         assert error.storage_type == "sql"
         assert "Connection failed" in str(error)
 

@@ -251,3 +251,37 @@ async def test_async_operations():
     # This is a placeholder for async testing
     # In a full implementation, this would test AsyncCsvStorage
     pass
+
+
+def test_delete_with_compression():
+    """Test that deletion works correctly with compressed CSV files."""
+    import os
+    from pathlib import Path
+    
+    with tempfile.TemporaryDirectory() as tmpdir:
+        temp_dir = Path(tmpdir)
+        
+        # Test with gzip compression
+        storage = CsvStorage(temp_dir, compression='gzip')
+        df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
+        
+        # Store with compression
+        storage.store(df, 'test_data')
+        assert 'test_data' in storage.table_names()
+        
+        # Verify compressed files exist
+        csv_file = temp_dir / 'test_data.csv.gzip'
+        csv_file_gz = temp_dir / 'test_data.csv.gz'
+        metadata_file = temp_dir / '_test_data_metadata.csv.gzip'
+        metadata_file_gz = temp_dir / '_test_data_metadata.csv.gz'
+        
+        assert csv_file.exists() or csv_file_gz.exists(), "Compressed CSV should exist"
+        assert metadata_file.exists() or metadata_file_gz.exists(), "Compressed metadata should exist"
+        
+        # Delete should work with compression
+        storage.delete('test_data')
+        assert 'test_data' not in storage.table_names()
+        
+        # Verify compressed files are deleted
+        assert not csv_file.exists() and not csv_file_gz.exists(), "CSV should be deleted"
+        assert not metadata_file.exists() and not metadata_file_gz.exists(), "Metadata should be deleted"

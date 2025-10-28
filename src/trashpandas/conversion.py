@@ -1,5 +1,4 @@
-"""
-Convert tables between storage types. 
+"""Convert tables between storage types.
 
 CsvStorage <-> SqlStorage
 CsvStorage <-> HdfStorage
@@ -12,19 +11,23 @@ HdfStorage <-> PickleStorage
 
 from sqlalchemy.engine import Engine
 
-from trashpandas.interfaces import IStorage
 from trashpandas.csv import CsvStorage
+from trashpandas.hdf5 import HdfStorage
+from trashpandas.interfaces import IStorage
 from trashpandas.pickle import PickleStorage
 from trashpandas.sql import SqlStorage
-from trashpandas.hdf5 import HdfStorage
 
 
-def convert_table_storage(table_name: str, starting_storage: IStorage, ending_storage: IStorage) -> None:
+def convert_table_storage(
+    table_name: str, starting_storage: IStorage, ending_storage: IStorage,
+) -> None:
     df = starting_storage.load(table_name)
     ending_storage.store(df, table_name)
 
 
-def convert_all_tables_storage(starting_storage: IStorage, ending_storage: IStorage) -> None:
+def convert_all_tables_storage(
+    starting_storage: IStorage, ending_storage: IStorage,
+) -> None:
     for table_name in starting_storage.table_names():
         convert_table_storage(table_name, starting_storage, ending_storage)
 
@@ -53,7 +56,9 @@ def csv_to_hdf_all(csv_folder_path: str, hdf_file_path: str) -> None:
     convert_all_tables_storage(csv_storage, hdf_storage)
 
 
-def csv_to_pickle(table_name: str, csv_folder_path: str, pickle_folder_path: str) -> None:
+def csv_to_pickle(
+    table_name: str, csv_folder_path: str, pickle_folder_path: str,
+) -> None:
     csv_storage = CsvStorage(csv_folder_path)
     pickle_storage = PickleStorage(pickle_folder_path)
     convert_table_storage(table_name, csv_storage, pickle_storage)
@@ -137,7 +142,9 @@ def hdf_to_pickle_all(hdf_file_path: str, pickle_folder_path: str) -> None:
     convert_all_tables_storage(hdf_storage, pickle_storage)
 
 
-def pickle_to_csv(table_name: str, pickle_folder_path: str, csv_folder_path: str) -> None:
+def pickle_to_csv(
+    table_name: str, pickle_folder_path: str, csv_folder_path: str,
+) -> None:
     pickle_storage = PickleStorage(pickle_folder_path)
     csv_storage = CsvStorage(csv_folder_path)
     convert_table_storage(table_name, pickle_storage, csv_storage)

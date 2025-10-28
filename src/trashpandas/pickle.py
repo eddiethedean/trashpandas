@@ -1,7 +1,9 @@
 """Pickle storage backend for TrashPandas DataFrames.
 
-This module provides pickle-based storage for Pandas DataFrames with full data type preservation.
-Pickle storage is the most efficient for preserving exact DataFrame structure and data types.
+This module provides pickle-based storage for Pandas DataFrames
+with full data type preservation.
+Pickle storage is the most efficient for preserving exact DataFrame
+structure and data types.
 
 Key Features:
     - Store DataFrames as pickle files with full data type preservation
@@ -16,28 +18,28 @@ Examples:
     Basic usage:
         >>> import pandas as pd
         >>> import trashpandas as tp
-        >>> 
+        >>>
         >>> df = pd.DataFrame({'name': ['Alice', 'Bob'], 'age': [25, 30]})
-        >>> 
+        >>>
         >>> # Using context manager (recommended)
         >>> with tp.PickleStorage('./data') as storage:
         ...     storage['users'] = df
         ...     loaded_df = storage['users']
         ...     print(f"Stored {len(storage)} tables")
-        
+
     With compression:
         >>> storage = tp.PickleStorage('./data', compression='bz2')
         >>> storage.store(df, 'users')  # Creates users.pickle.bz2
-        
+
     With custom file extension:
         >>> storage = tp.PickleStorage('./data', file_extension='.pkl')
         >>> storage.store(df, 'users')  # Creates users.pkl
-        
+
     Using pathlib.Path:
         >>> from pathlib import Path
         >>> storage = tp.PickleStorage(Path('./data'))
         >>> storage.store(df, 'users')
-        
+
     Bulk operations:
         >>> dataframes = {'users': users_df, 'orders': orders_df}
         >>> storage.store_many(dataframes)
@@ -49,28 +51,59 @@ Raises:
     PermissionError: When unable to write to the specified directory
     ValidationError: When table names contain invalid characters
     CompressionError: When compression/decompression fails
+
 """
 
 from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import List, Iterator, Union, Optional, Dict
+from typing import Iterator, Literal, Optional, cast
 
 from pandas import DataFrame, read_pickle
 
-from trashpandas.interfaces import IStorage, IFileStorage
-from trashpandas.exceptions import TableNotFoundError
+from trashpandas.interfaces import IFileStorage
+from trashpandas.validation import validate_table_name
+
+
+def _safe_read_pickle(
+    path: str,
+    compression: Literal["infer", "gzip", "bz2", "xz", "zstd"] | None,
+) -> DataFrame:  # noqa: S301
+    """Safely read a pickle file.
+
+    WARNING: Only use this with trusted pickle files. Pickle can execute
+    arbitrary code during deserialization, making it unsafe for untrusted
+    data.
+
+    Args:
+        path: Path to the pickle file
+        compression: Optional compression type
+
+    Returns:
+        DataFrame from the pickle file
+
+    """
+    result = read_pickle(path, compression=compression)  # noqa: S301
+    return cast("DataFrame", result)
 
 
 class PickleStorage(IFileStorage):
-    def __init__(self, folder_path: Union[str, Path], file_extension: str = '.pickle', compression: Optional[str] = None) -> None:
-        """Takes folder path where DataFrames are stored as pickle files.
-        
+    def __init__(
+        self,
+        folder_path: str | Path,
+        file_extension: str = ".pickle",
+        compression: str | None = None,
+    ) -> None:
+        """Initialize pickle storage with a folder path.
+
+        DataFrames are stored as pickle files.
+
         Args:
             folder_path: Path to directory for pickle storage
             file_extension: File extension for pickle files
             compression: Optional compression type ('gzip', 'bz2', 'xz', 'zstd')
+
         """
         self.path = Path(folder_path)
         self.path.mkdir(parents=True, exist_ok=True)
@@ -91,125 +124,186 @@ class PickleStorage(IFileStorage):
     def __delitem__(self, key: str) -> None:
         """Delete DataFrame pickle file."""
         self.delete(key)
-    
+
     def __iter__(self) -> Iterator[str]:
         """Iterate over table names."""
         return iter(self.table_names())
-    
+
     def __len__(self) -> int:
         """Get number of stored tables."""
         return len(self.table_names())
-    
+
     def __contains__(self, key: str) -> bool:
         """Check if table exists."""
         return key in self.table_names()
-    
+
     def __enter__(self) -> PickleStorage:
         """Enter context manager."""
         return self
-    
-    def __exit__(self, exc_type: Optional[Exception], exc_val: Optional[Exception], exc_tb: Optional[object]) -> None:
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: object | None,
+    ) -> None:
         """Exit context manager."""
         pass
 
-    def store(self, df: DataFrame, table_name: str, schema: Optional[str] = None) -> None:
+    def store(
+        self, df: DataFrame, table_name: str, schema: str | None = None,
+    ) -> None:
         """Store DataFrame pickle file."""
-        store_df_pickle(df, table_name, str(self.path), self.file_extension, self.compression)
+        store_df_pickle(
+            df, table_name, str(self.path), self.file_extension, self.compression,
+        )
 
-    def load(self, table_name: str, schema: Optional[str] = None) -> DataFrame:
+    def load(self, table_name: str, schema: str | None = None) -> DataFrame:
         """Retrieve DataFrame from pickle file."""
-        return load_df_pickle(table_name, str(self.path), self.file_extension, self.compression)
+        return load_df_pickle(
+            table_name, str(self.path), self.file_extension, self.compression,
+        )
 
-    def delete(self, table_name: str, schema: Optional[str] = None) -> None:
+    def delete(self, table_name: str, schema: str | None = None) -> None:
         """Delete DataFrame pickle file."""
-        delete_table_pickle(table_name, str(self.path), self.file_extension)
+        delete_table_pickle(
+            table_name, str(self.path), self.file_extension, self.compression,
+        )
 
-    def table_names(self, schema: Optional[str] = None) -> List[str]:
+    def table_names(self, schema: str | None = None) -> list[str]:
         """Get list of stored table names."""
-        return table_names_pickle(str(self.path))
-    
-    def store_many(self, dataframes: Dict[str, DataFrame], schema: Optional[str] = None) -> None:
+        return table_names_pickle(str(self.path), self.file_extension)
+
+    def store_many(
+        self, dataframes: dict[str, DataFrame], schema: str | None = None,
+    ) -> None:
         """Store multiple DataFrames as pickle files.
-        
+
         Args:
             dataframes: Dictionary mapping table names to DataFrames
             schema: Optional schema name (ignored for pickle)
+
         """
         for table_name, df in dataframes.items():
-            store_df_pickle(df, table_name, str(self.path), self.file_extension, self.compression)
-    
-    def load_many(self, table_names: List[str], schema: Optional[str] = None) -> Dict[str, DataFrame]:
+            store_df_pickle(
+                df, table_name, str(self.path), self.file_extension, self.compression,
+            )
+
+    def load_many(
+        self, table_names: list[str], schema: str | None = None,
+    ) -> dict[str, DataFrame]:
         """Load multiple DataFrames from pickle files.
-        
+
         Args:
             table_names: List of table names to load
             schema: Optional schema name (ignored for pickle)
-            
+
         Returns:
             Dictionary mapping table names to DataFrames
+
         """
         result = {}
         for table_name in table_names:
             result[table_name] = self.load(table_name, schema=schema)
         return result
-    
-    def delete_many(self, table_names: List[str], schema: Optional[str] = None) -> None:
+
+    def delete_many(self, table_names: list[str], schema: str | None = None) -> None:
         """Delete multiple pickle files.
-        
+
         Args:
             table_names: List of table names to delete
             schema: Optional schema name (ignored for pickle)
+
         """
         for table_name in table_names:
-            delete_table_pickle(table_name, str(self.path), self.file_extension)
+            delete_table_pickle(
+                table_name, str(self.path), self.file_extension, self.compression,
+            )
 
 
-def store_df_pickle(df: DataFrame, table_name: str, path: str, file_extension: str = '.pickle', compression: Optional[str] = None) -> None:
+def store_df_pickle(
+    df: DataFrame,
+    table_name: str,
+    path: str,
+    file_extension: str = ".pickle",
+    compression: str | None = None,
+) -> None:
     """Store DataFrame as pickle file.
-    
+
     Args:
         df: DataFrame to store
         table_name: Name of the table
         path: Directory path for storage
         file_extension: File extension for pickle files
         compression: Optional compression type ('gzip', 'bz2', 'xz', 'zstd')
+
     """
+    validate_table_name(table_name, storage_type="pickle")
     pickle_path = _get_pickle_path(table_name, path, file_extension, compression)
-    df.to_pickle(pickle_path, compression=compression)
+    compression_literal = cast(
+        "Optional[Literal['infer', 'gzip', 'bz2', 'xz', 'zstd']]", compression,
+    )
+    df.to_pickle(pickle_path, compression=compression_literal)
 
 
-def load_df_pickle(table_name: str, path: str, file_extension: str = '.pickle', compression: Optional[str] = None) -> DataFrame:
+def load_df_pickle(
+    table_name: str,
+    path: str,
+    file_extension: str = ".pickle",
+    compression: str | None = None,
+) -> DataFrame:
     """Retrieve DataFrame from pickle file.
-    
+
     Args:
         table_name: Name of the table
         path: Directory path for storage
         file_extension: File extension for pickle files
         compression: Optional compression type ('gzip', 'bz2', 'xz', 'zstd')
-        
+
     Returns:
         Loaded DataFrame
+
     """
+    validate_table_name(table_name, storage_type="pickle")
     pickle_path = _get_pickle_path(table_name, path, file_extension, compression)
-    return read_pickle(pickle_path, compression=compression)
+    compression_literal = cast(
+        "Optional[Literal['infer', 'gzip', 'bz2', 'xz', 'zstd']]", compression,
+    )
+    df = _safe_read_pickle(pickle_path, compression_literal)
+    return df
 
 
-def delete_table_pickle(table_name: str, path: str, file_extension: str = '.pickle') -> None:
+def delete_table_pickle(
+    table_name: str,
+    path: str,
+    file_extension: str = ".pickle",
+    compression: str | None = None,
+) -> None:
     """Delete DataFrame pickle file."""
-    pickle_path = _get_pickle_path(table_name, path)
-    os.remove(pickle_path)
+    validate_table_name(table_name, storage_type="pickle")
+    pickle_path = _get_pickle_path(table_name, path, file_extension, compression)
+    if os.path.exists(pickle_path):
+        os.remove(pickle_path)
 
 
-def table_names_pickle(path: str, file_extension: str = '.pickle') -> List[str]:
+def table_names_pickle(path: str, file_extension: str = ".pickle") -> list[str]:
     """Get list of stored table names."""
     filenames = os.listdir(path)
-    return [filename.split(file_extension)[0] for filename in filenames
-                if filename.endswith(file_extension) and '_metadata' not in filename]
+    return [
+        filename.split(file_extension)[0]
+        for filename in filenames
+        if filename.endswith(file_extension) and "_metadata" not in filename
+    ]
 
 
-def _get_pickle_path(table_name: str, path: str, file_extension: str = '.pickle', compression: Optional[str] = None) -> str:
+def _get_pickle_path(
+    table_name: str,
+    path: str,
+    file_extension: str = ".pickle",
+    compression: str | None = None,
+) -> str:
     """Return joined folder path and pickle file name for DataFrame."""
-    filename = f'{table_name}{file_extension}'
+    filename = f"{table_name}{file_extension}"
     if compression:
-        filename += f'.{compression}'
+        filename += f".{compression}"
     return os.path.join(path, filename)

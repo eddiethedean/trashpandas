@@ -139,3 +139,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# ruff
+.ruff_cache/
+
+# pytest benchmark
+benchmark/

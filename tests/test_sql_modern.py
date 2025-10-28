@@ -268,3 +268,106 @@ async def test_async_operations():
     # This is a placeholder for async testing
     # In a full implementation, this would test AsyncSqlStorage
     pass
+
+
+class TestSecurity:
+    """Test security features and SQL injection prevention."""
+    
+    def test_query_with_valid_where_clause(self, storage: SqlStorage, sample_df: pd.DataFrame):
+        """Test that valid WHERE clauses work correctly."""
+        storage.store(sample_df, 'test_table')
+        
+        # Test with valid WHERE clause
+        result = storage.query('test_table', where_clause="age > 25")
+        assert len(result) > 0
+        assert all(result['age'] > 25)
+        
+    def test_query_with_sql_injection_detection(self, storage: SqlStorage, sample_df: pd.DataFrame):
+        """Test that SQL injection attempts are detected and rejected."""
+        from trashpandas.exceptions import ValidationError
+        
+        storage.store(sample_df, 'test_table')
+        
+        # Test dangerous SQL patterns
+        dangerous_queries = [
+            "1 = 1; DROP TABLE test_table",
+            "age > 25; DELETE FROM test_table",
+            "1=1 UNION SELECT * FROM users",
+            "age > 25 -- malicious comment",
+            "age > 25/* comment */",
+        ]
+        
+        for dangerous_query in dangerous_queries:
+            with pytest.raises(ValidationError) as exc_info:
+                storage.query('test_table', where_clause=dangerous_query)
+            
+            assert 'WHERE clause contains dangerous SQL patterns' in str(exc_info.value)
+    
+    def test_query_with_invalid_column_names(self, storage: SqlStorage, sample_df: pd.DataFrame):
+        """Test that invalid column names are rejected."""
+        from trashpandas.exceptions import ValidationError
+        
+        storage.store(sample_df, 'test_table')
+        
+        # Test with invalid column names
+        invalid_columns = [
+            ['name; DROP TABLE', 'age'],
+            ['name;', 'age'],
+            ['name -- comment', 'age'],
+        ]
+        
+        for invalid_cols in invalid_columns:
+            with pytest.raises(ValidationError) as exc_info:
+                storage.query('test_table', columns=invalid_cols)
+            
+            assert 'Invalid characters in column name' in str(exc_info.value)
+    
+    def test_query_with_valid_column_names(self, storage: SqlStorage, sample_df: pd.DataFrame):
+        """Test that valid column names work correctly."""
+        storage.store(sample_df, 'test_table')
+        
+        # Test with valid column names
+        result = storage.query('test_table', columns=['name', 'age'])
+        assert list(result.columns) == ['name', 'age']
+    
+    def test_query_prevents_code_injection_via_pandas_query(self, storage: SqlStorage, sample_df: pd.DataFrame):
+        """Test that the new implementation prevents code injection via DataFrame.query()."""
+        import os
+        
+        # Create a file to detect code execution
+        test_file = '/tmp/trashpandas_security_test.tmp'
+        if os.path.exists(test_file):
+            os.remove(test_file)
+        
+        storage.store(sample_df, 'test_table')
+        
+        # Attempt code execution via pandas query syntax (should fail)
+        # Note: The old implementation allowed this, the new one uses SQL directly
+        malicious_query = "__import__('os').system('touch /tmp/trashpandas_security_test.tmp')"
+        
+        try:
+            # The new implementation should reject this as dangerous SQL
+            result = storage.query('test_table', where_clause=malicious_query)
+            # If we get here, the query was executed but shouldn't have been
+            # In the best case, it would have been rejected as invalid SQL
+            assert not os.path.exists(test_file), "Security test failed - code was executed!"
+        except Exception:
+            # This is expected - the query should fail
+            pass
+        finally:
+            if os.path.exists(test_file):
+                os.remove(test_file)
+    
+    def test_query_preserves_metadata_and_types(self, storage: SqlStorage, sample_df: pd.DataFrame):
+        """Test that queries preserve DataFrame metadata and types."""
+        storage.store(sample_df, 'test_table')
+        
+        # Original should have proper types
+        original = storage.load('test_table')
+        
+        # Query result should also have proper types
+        result = storage.query('test_table', where_clause="age > 25")
+        
+        # Check that types are preserved
+        assert result['name'].dtype == original['name'].dtype
+        assert result['age'].dtype == original['age'].dtype

@@ -63,6 +63,17 @@ pickle_storage = tp.PickleStorage('./pickles', compression='bz2')
 pickle_storage.store(df, 'people')
 ```
 
+## 📖 Example Notebooks
+
+Check out these interactive Jupyter notebooks demonstrating TrashPandas features:
+
+- **[Basic Usage](https://github.com/eddiethedean/trashpandas/blob/main/examples/01_basic_usage.ipynb)** - Introduction to CSV, SQL, and Pickle storage
+- **[Advanced Features](https://github.com/eddiethedean/trashpandas/blob/main/examples/02_advanced_features.ipynb)** - Compression, bulk operations, and data type preservation
+- **[Format Conversion](https://github.com/eddiethedean/trashpandas/blob/main/examples/03_format_conversion.ipynb)** - Converting DataFrames between different storage formats
+- **[Query Capabilities](https://github.com/eddiethedean/trashpandas/blob/main/examples/04_query_capabilities.ipynb)** - Advanced SQL querying with WHERE clauses and filtering
+
+All notebooks are fully executed with outputs included. Click the links above to view them on GitHub or open them in Jupyter Notebook/Lab.
+
 ## 📚 API Reference
 
 ### Storage Classes
@@ -282,11 +293,11 @@ ruff format src tests
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+Contributions are welcome! Please see our [Contributing Guide](https://github.com/eddiethedean/trashpandas/blob/main/CONTRIBUTING.md) for details.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/eddiethedean/trashpandas/blob/main/LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
