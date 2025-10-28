@@ -43,6 +43,10 @@ def delete_all_files(path):
     import shutil
     import time
 
+    # Check if directory exists first
+    if not os.path.exists(path):
+        return
+    
     for f in os.listdir(path):
         file_path = os.path.join(path, f)
         try:
