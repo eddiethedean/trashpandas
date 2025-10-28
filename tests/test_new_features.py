@@ -382,3 +382,154 @@ class TestBulkOperationsEdgeCases:
         # Should have only one table
         assert len(storage) == 1
         assert "duplicate" in storage
+
+
+class TestMetadataModule:
+    """Test metadata.py module functionality."""
+
+    def test_table_metadata_from_dict_edge_cases(self):
+        """Test TableMetadata.from_dataframe with edge cases."""
+        from trashpandas.metadata import TableMetadata
+
+        # Test with minimal DataFrame
+        df = pd.DataFrame({"a": [1, 2], "b": ["x", "y"]})
+        metadata = TableMetadata.from_dataframe(df, "test_table")
+        assert metadata.columns == ["a", "b"]
+        assert metadata.column_types["a"] == "int64"
+        assert metadata.column_types["b"] == "object"
+
+        # Test with empty DataFrame
+        empty_df = pd.DataFrame()
+        metadata = TableMetadata.from_dataframe(empty_df, "empty_table")
+        assert metadata.columns == []
+        assert metadata.column_types == {}
+
+    def test_table_metadata_to_dict_edge_cases(self):
+        """Test TableMetadata.to_dataframe with edge cases."""
+        from trashpandas.metadata import TableMetadata
+
+        # Test with complex metadata
+        df = pd.DataFrame({"col1": [1, 2], "col2": ["a", "b"]})
+        metadata = TableMetadata.from_dataframe(df, "test_table")
+        
+        # Test that we can recreate the DataFrame structure
+        assert metadata.table_name == "test_table"
+        assert metadata.columns == ["col1", "col2"]
+        assert metadata.column_types["col1"] == "int64"
+        assert metadata.column_types["col2"] == "object"
+
+    def test_table_metadata_validation_edge_cases(self):
+        """Test TableMetadata validation with edge cases."""
+        from trashpandas.metadata import TableMetadata
+
+        # Test with DataFrame containing various types
+        df = pd.DataFrame({
+            "int_col": [1, 2, 3],
+            "str_col": ["a", "b", "c"],
+            "float_col": [1.1, 2.2, 3.3],
+        })
+        metadata = TableMetadata.from_dataframe(df, "test_table")
+        
+        # Verify all column types are captured
+        assert len(metadata.columns) == 3
+        assert "int_col" in metadata.column_types
+        assert "str_col" in metadata.column_types
+        assert "float_col" in metadata.column_types
+
+    def test_table_metadata_str_repr_edge_cases(self):
+        """Test TableMetadata string representations with edge cases."""
+        from trashpandas.metadata import TableMetadata
+
+        # Test with DataFrame containing long column names
+        long_columns = [f"very_long_column_name_{i}" for i in range(5)]
+        df = pd.DataFrame({col: [1, 2] for col in long_columns})
+        metadata = TableMetadata.from_dataframe(df, "test_table")
+
+        str_repr = str(metadata)
+        assert "TableMetadata" in str_repr
+        assert "test_table" in str_repr
+        assert "columns=5" in str_repr  # Should show count of columns
+
+        repr_str = repr(metadata)
+        assert "TableMetadata" in repr_str
+        assert "test_table" in repr_str
+
+
+class TestInterfacesModule:
+    """Test interfaces.py module functionality."""
+
+    def test_istorage_abstract_methods(self):
+        """Test that IStorage abstract methods are defined."""
+        from trashpandas.interfaces import IStorage
+
+        # Test that the interface defines the required methods
+        assert hasattr(IStorage, "store")
+        assert hasattr(IStorage, "load")
+        assert hasattr(IStorage, "delete")
+        assert hasattr(IStorage, "table_names")
+        
+        # Test that these are abstract methods
+        import inspect
+        assert inspect.isabstract(IStorage)
+
+    def test_ifilestorage_abstract_methods(self):
+        """Test that IFileStorage abstract methods are defined."""
+        from trashpandas.interfaces import IFileStorage
+
+        # Test that the interface defines the required methods
+        assert hasattr(IFileStorage, "store")
+        assert hasattr(IFileStorage, "load")
+        assert hasattr(IFileStorage, "delete")
+        assert hasattr(IFileStorage, "table_names")
+        
+        # Test that these are abstract methods
+        import inspect
+        assert inspect.isabstract(IFileStorage)
+
+    def test_iasyncstorage_abstract_methods(self):
+        """Test that IAsyncStorage abstract methods are defined."""
+        from trashpandas.interfaces import IAsyncStorage
+
+        # Test that the interface defines the required methods
+        assert hasattr(IAsyncStorage, "store")
+        assert hasattr(IAsyncStorage, "load")
+        assert hasattr(IAsyncStorage, "delete")
+        assert hasattr(IAsyncStorage, "table_names")
+        
+        # Test that these are abstract methods
+        import inspect
+        assert inspect.isabstract(IAsyncStorage)
+
+    def test_iasyncfilestorage_abstract_methods(self):
+        """Test that IAsyncFileStorage abstract methods are defined."""
+        from trashpandas.interfaces import IAsyncFileStorage
+
+        # Test that the interface defines the required methods
+        assert hasattr(IAsyncFileStorage, "store")
+        assert hasattr(IAsyncFileStorage, "load")
+        assert hasattr(IAsyncFileStorage, "delete")
+        assert hasattr(IAsyncFileStorage, "table_names")
+        
+        # Test that these are abstract methods
+        import inspect
+        assert inspect.isabstract(IAsyncFileStorage)
+
+    def test_storage_contract_enforcement(self):
+        """Test that storage implementations follow the contract."""
+        from trashpandas.interfaces import IStorage
+
+        # Test that the interface defines the contract
+        assert hasattr(IStorage, "store")
+        assert hasattr(IStorage, "load")
+        assert hasattr(IStorage, "delete")
+        assert hasattr(IStorage, "table_names")
+
+    def test_file_storage_path_handling(self):
+        """Test that file storage implementations handle paths correctly."""
+        from trashpandas.interfaces import IFileStorage
+
+        # Test that the interface defines path handling
+        assert hasattr(IFileStorage, "store")
+        assert hasattr(IFileStorage, "load")
+        assert hasattr(IFileStorage, "delete")
+        assert hasattr(IFileStorage, "table_names")
