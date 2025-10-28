@@ -27,7 +27,7 @@ class TableMetadata:
     index_types: dict[str, Any] = field(default_factory=dict)
     storage_format: str = "unknown"
     created_at: str | None = None
-    version: str = "1.0.0"
+    version: str = "1.0.2"
 
     @classmethod
     def from_dataframe(

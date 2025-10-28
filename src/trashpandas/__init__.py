@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import importlib.util
 
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 __author__ = "Odos Matthews"
 __email__ = "odos@example.com"
 
