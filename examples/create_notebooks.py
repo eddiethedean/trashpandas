@@ -1,7 +1,6 @@
 """Script to create example notebooks for TrashPandas features."""
 
 import json
-import os
 from pathlib import Path
 
 
@@ -54,7 +53,7 @@ def code_cell(source):
 notebook1_cells = [
     markdown_cell("# TrashPandas: Basic Usage\n\nThis notebook demonstrates the basic usage of TrashPandas."),
     markdown_cell("## Installation and Imports"),
-    code_cell("import pandas as pd\nimport numpy as np\nimport trashpandas as tp\n\nprint(f\"TrashPandas version: {tp.__version__}\")\nprint(f\"Pandas version: {pd.__version__}\")"),
+    code_cell('import pandas as pd\nimport numpy as np\nimport trashpandas as tp\n\nprint(f"TrashPandas version: {tp.__version__}")\nprint(f"Pandas version: {pd.__version__}")'),
     markdown_cell("## Creating Sample Data"),
     code_cell(
         "# Create sample DataFrames\n"
@@ -66,8 +65,8 @@ notebook1_cells = [
         "              'diana@example.com', 'eve@example.com'],\n"
         "    'active': [True, True, False, True, True]\n"
         "})\n\n"
-        "print(\"Sample DataFrame created:\")\n"
-        "print(users_df)"
+        'print("Sample DataFrame created:")\n'
+        "print(users_df)",
     ),
     markdown_cell("## 1. CSV Storage"),
     code_cell(
@@ -77,17 +76,17 @@ notebook1_cells = [
         "    csv_storage['users'] = users_df\n"
         "    \n"
         "    # Check how many tables we have\n"
-        "    print(f\"Stored {len(csv_storage)} tables\")\n"
-        "    print(f\"Table names: {list(csv_storage)}\")\n"
+        '    print(f"Stored {len(csv_storage)} tables")\n'
+        '    print(f"Table names: {list(csv_storage)}")\n'
         "    \n"
         "    # Retrieve DataFrame\n"
         "    loaded_users = csv_storage['users']\n"
         "    \n"
-        "    print(\"\\nLoaded DataFrame:\")\n"
+        '    print("\\nLoaded DataFrame:")\n'
         "    print(loaded_users)\n"
         "    \n"
         "    # Verify data integrity\n"
-        "    print(\"\\nDataFrames match:\", users_df.equals(loaded_users))"
+        '    print("\\nDataFrames match:", users_df.equals(loaded_users))',
     ),
     markdown_cell("## 2. SQL Storage"),
     code_cell(
@@ -96,17 +95,17 @@ notebook1_cells = [
         "    # Store DataFrame\n"
         "    sql_storage['users'] = users_df\n"
         "    \n"
-        "    print(f\"Stored {len(sql_storage)} tables\")\n"
+        '    print(f"Stored {len(sql_storage)} tables")\n'
         "    \n"
         "    # Load DataFrame\n"
         "    loaded_users = sql_storage['users']\n"
-        "    print(\"\\nLoaded from SQL:\")\n"
+        '    print("\\nLoaded from SQL:")\n'
         "    print(loaded_users)\n"
         "    \n"
         "    # Query with filtering\n"
         "    active_users = sql_storage.query('users', where_clause=\"active = 1\")\n"
-        "    print(\"\\nActive users:\")\n"
-        "    print(active_users)"
+        '    print("\\nActive users:")\n'
+        "    print(active_users)",
     ),
     markdown_cell("## 3. Pickle Storage"),
     code_cell(
@@ -114,16 +113,16 @@ notebook1_cells = [
         "    # Store DataFrame\n"
         "    pickle_storage['users'] = users_df\n"
         "    \n"
-        "    print(f\"Stored {len(pickle_storage)} tables\")\n"
+        '    print(f"Stored {len(pickle_storage)} tables")\n'
         "    \n"
         "    # Load DataFrame\n"
         "    loaded_users = pickle_storage['users']\n"
-        "    print(\"\\nLoaded from Pickle:\")\n"
+        '    print("\\nLoaded from Pickle:")\n'
         "    print(loaded_users)\n"
         "    \n"
         "    # Data types are perfectly preserved\n"
-        "    print(\"\\nData types:\")\n"
-        "    print(loaded_users.dtypes)"
+        '    print("\\nData types:")\n'
+        "    print(loaded_users.dtypes)",
     ),
 ]
 
@@ -148,7 +147,7 @@ notebook2_cells = [
         "    \n"
         "    # Load compressed data (automatic detection)\n"
         "    loaded = storage['large_data']\n"
-        "    print(f\"Successfully loaded {len(loaded)} rows from compressed file\")"
+        '    print(f"Successfully loaded {len(loaded)} rows from compressed file")',
     ),
     markdown_cell("## Bulk Operations"),
     code_cell(
@@ -160,15 +159,15 @@ notebook2_cells = [
         "with tp.SqlStorage('sqlite:///./bulk.db') as storage:\n"
         "    # Store many at once\n"
         "    storage.store_many(all_data)\n"
-        "    print(f\"Stored {len(storage)} tables\")\n"
+        '    print(f"Stored {len(storage)} tables")\n'
         "    \n"
         "    # Load many at once\n"
         "    loaded = storage.load_many(['users', 'products', 'orders'])\n"
-        "    print(f\"Loaded {len(loaded)} tables\")\n"
+        '    print(f"Loaded {len(loaded)} tables")\n'
         "    \n"
         "    # Delete many at once\n"
         "    storage.delete_many(['orders'])\n"
-        "    print(f\"After deletion: {len(storage)} tables\")"
+        '    print(f"After deletion: {len(storage)} tables")',
     ),
     markdown_cell("## Data Type Preservation"),
     code_cell(
@@ -180,17 +179,17 @@ notebook2_cells = [
         "    'bool_col': [True, False, True],\n"
         "    'date_col': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03'])\n"
         "})\n\n"
-        "print(\"Original data types:\")\n"
+        'print("Original data types:")\n'
         "print(df.dtypes)\n\n"
         "with tp.PickleStorage('./data_types') as storage:\n"
         "    storage['typed_data'] = df\n"
         "    loaded = storage['typed_data']\n"
         "    \n"
-        "    print(\"\\nLoaded data types:\")\n"
+        '    print("\\nLoaded data types:")\n'
         "    print(loaded.dtypes)\n"
         "    \n"
-        "    print(\"\\nData types preserved:\")\n"
-        "    print(df.dtypes.equals(loaded.dtypes))"
+        '    print("\\nData types preserved:")\n'
+        "    print(df.dtypes.equals(loaded.dtypes))",
     ),
 ]
 
@@ -215,13 +214,13 @@ notebook3_cells = [
         "    \n"
         "    # Convert CSV to SQL\n"
         "    tp.csv_to_sql('users', './data_conversion', 'sqlite:///./converted.db')\n"
-        "    print(\"Converted from CSV to SQL\")\n"
+        '    print("Converted from CSV to SQL")\n'
         "    \n"
         "    # Load from SQL to verify\n"
         "    with tp.SqlStorage('sqlite:///./converted.db') as sql_storage:\n"
         "        loaded = sql_storage['users']\n"
-        "        print(\"\\nLoaded from converted SQL database:\")\n"
-        "        print(loaded)"
+        '        print("\\nLoaded from converted SQL database:")\n'
+        "        print(loaded)",
     ),
     markdown_cell("## Batch Conversion"),
     code_cell(
@@ -234,11 +233,11 @@ notebook3_cells = [
         "    \n"
         "    # Convert all tables from CSV to SQL\n"
         "    tp.csv_to_sql_all('./data_batch', 'sqlite:///./batch_converted.db')\n"
-        "    print(\"Batch conversion complete\")\n"
+        '    print("Batch conversion complete")\n'
         "    \n"
         "    # Verify\n"
         "    with tp.SqlStorage('sqlite:///./batch_converted.db') as sql_storage:\n"
-        "        print(f\"Converted {len(sql_storage)} tables\")"
+        '        print(f"Converted {len(sql_storage)} tables")',
     ),
 ]
 
@@ -264,42 +263,42 @@ notebook4_cells = [
         "    \n"
         "    # Get all data\n"
         "    all_users = storage.query('users')\n"
-        "    print(f\"All users: {len(all_users)} rows\")\n"
-        "    print(all_users)"
+        '    print(f"All users: {len(all_users)} rows")\n'
+        "    print(all_users)",
     ),
     markdown_cell("## Filtering with WHERE Clause"),
     code_cell(
         "with tp.SqlStorage('sqlite:///./query_demo.db') as storage:\n"
         "    # Filter by age\n"
         "    young_users = storage.query('users', where_clause=\"age < 30\")\n"
-        "    print(\"Users under 30:\")\n"
+        '    print("Users under 30:")\n'
         "    print(young_users)\n"
         "    \n"
         "    # Filter by city\n"
         "    nyc_users = storage.query('users', where_clause=\"city = 'NYC'\")\n"
-        "    print(\"\\nUsers in NYC:\")\n"
+        '    print("\\nUsers in NYC:")\n'
         "    print(nyc_users)\n"
         "    \n"
         "    # Filter by boolean\n"
         "    active_users = storage.query('users', where_clause=\"active = 1\")\n"
-        "    print(\"\\nActive users:\")\n"
-        "    print(active_users)"
+        '    print("\\nActive users:")\n'
+        "    print(active_users)",
     ),
     markdown_cell("## Selecting Specific Columns"),
     code_cell(
         "with tp.SqlStorage('sqlite:///./query_demo.db') as storage:\n"
         "    # Get only name and email\n"
         "    names = storage.query('users', columns=['name', 'city'])\n"
-        "    print(\"Names and cities:\")\n"
-        "    print(names)"
+        '    print("Names and cities:")\n'
+        "    print(names)",
     ),
     markdown_cell("## Limiting Results"),
     code_cell(
         "with tp.SqlStorage('sqlite:///./query_demo.db') as storage:\n"
         "    # Get first 3 users\n"
         "    top_users = storage.query('users', limit=3)\n"
-        "    print(\"First 3 users:\")\n"
-        "    print(top_users)"
+        '    print("First 3 users:")\n'
+        "    print(top_users)",
     ),
 ]
 

@@ -4,25 +4,23 @@ import tempfile
 from pathlib import Path
 from typing import Generator
 
-import pytest
 import pandas as pd
+import pytest
 from sqlalchemy import create_engine
 
-from trashpandas.sql import SqlStorage
 from trashpandas.csv import CsvStorage
-from trashpandas.pickle import PickleStorage
 from trashpandas.exceptions import (
-    TrashPandasError,
-    StorageError,
-    TableNotFoundError,
-    TableAlreadyExistsError,
+    CompressionError,
+    ConversionError,
+    MetadataCorruptedError,
     MetadataError,
     MetadataNotFoundError,
-    MetadataCorruptedError,
     StorageConnectionError,
+    StorageError,
+    TableAlreadyExistsError,
+    TableNotFoundError,
+    TrashPandasError,
     ValidationError,
-    ConversionError,
-    CompressionError,
 )
 from trashpandas.metadata import TableMetadata
 
@@ -38,7 +36,7 @@ def temp_dir() -> Generator[Path, None, None]:
 def sqlite_engine(temp_dir: Path):
     """Create a SQLite engine for testing."""
     db_path = temp_dir / "test.db"
-    engine = create_engine(f'sqlite:///{db_path}')
+    engine = create_engine(f"sqlite:///{db_path}")
     yield engine
     engine.dispose()
 
@@ -47,9 +45,9 @@ def sqlite_engine(temp_dir: Path):
 def sample_df() -> pd.DataFrame:
     """Create a sample DataFrame for testing."""
     return pd.DataFrame({
-        'name': ['Alice', 'Bob', 'Charlie'],
-        'age': [25, 30, 35],
-        'city': ['New York', 'London', 'Tokyo']
+        "name": ["Alice", "Bob", "Charlie"],
+        "age": [25, 30, 35],
+        "city": ["New York", "London", "Tokyo"],
     })
 
 
@@ -131,7 +129,7 @@ class TestTableMetadata:
     def test_from_dataframe(self, sample_df: pd.DataFrame):
         """Test creating metadata from DataFrame."""
         metadata = TableMetadata.from_dataframe(sample_df, "test_table", "csv")
-        
+
         assert metadata.table_name == "test_table"
         assert metadata.storage_format == "csv"
         assert metadata.columns == list(sample_df.columns)
@@ -141,10 +139,10 @@ class TestTableMetadata:
         """Test converting metadata to DataFrame."""
         metadata = TableMetadata.from_dataframe(sample_df, "test_table", "csv")
         metadata_df = metadata.to_dataframe()
-        
-        assert 'column' in metadata_df.columns
-        assert 'index' in metadata_df.columns
-        assert 'datatype' in metadata_df.columns
+
+        assert "column" in metadata_df.columns
+        assert "index" in metadata_df.columns
+        assert "datatype" in metadata_df.columns
 
     def test_validation(self, sample_df: pd.DataFrame):
         """Test metadata validation."""
@@ -158,9 +156,9 @@ class TestTableMetadata:
             columns=["col1", "col1"],  # Duplicate
             column_types={"col1": "int64"},
             index_columns=[],
-            index_types={}
+            index_types={},
         )
-        
+
         with pytest.raises(MetadataCorruptedError):
             metadata.validate()
 
@@ -171,9 +169,9 @@ class TestTableMetadata:
             columns=["col1", "col2"],
             column_types={"col1": "int64"},  # Missing col2
             index_columns=[],
-            index_types={}
+            index_types={},
         )
-        
+
         with pytest.raises(MetadataCorruptedError):
             metadata.validate()
 
@@ -181,7 +179,7 @@ class TestTableMetadata:
         """Test getting column types as pandas dtypes."""
         metadata = TableMetadata.from_dataframe(sample_df, "test_table", "csv")
         types = metadata.get_column_types()
-        
+
         assert isinstance(types, dict)
         assert len(types) == len(sample_df.columns)
 
@@ -190,14 +188,14 @@ class TestTableMetadata:
         sample_df.index.name = "id"
         metadata = TableMetadata.from_dataframe(sample_df, "test_table", "csv")
         types = metadata.get_index_types()
-        
+
         assert isinstance(types, dict)
 
     def test_str_representation(self, sample_df: pd.DataFrame):
         """Test string representation."""
         metadata = TableMetadata.from_dataframe(sample_df, "test_table", "csv")
         str_repr = str(metadata)
-        
+
         assert "test_table" in str_repr
         assert "3" in str_repr  # Number of columns
 
@@ -205,7 +203,7 @@ class TestTableMetadata:
         """Test detailed string representation."""
         metadata = TableMetadata.from_dataframe(sample_df, "test_table", "csv")
         repr_str = repr(metadata)
-        
+
         assert "TableMetadata" in repr_str
         assert "test_table" in repr_str
 
@@ -217,85 +215,85 @@ class TestEdgeCases:
         """Test storing and loading empty DataFrame."""
         empty_df = pd.DataFrame()
         storage = CsvStorage(temp_dir)
-        
-        storage.store(empty_df, 'empty')
-        loaded_df = storage.load('empty')
-        
+
+        storage.store(empty_df, "empty")
+        loaded_df = storage.load("empty")
+
         # Empty DataFrames may have different inferred types, so check shape and columns
         assert empty_df.shape == loaded_df.shape
         assert list(empty_df.columns) == list(loaded_df.columns)
 
     def test_single_row_dataframe(self, temp_dir: Path):
         """Test storing and loading single row DataFrame."""
-        single_row_df = pd.DataFrame({'value': [42]})
+        single_row_df = pd.DataFrame({"value": [42]})
         storage = CsvStorage(temp_dir)
-        
-        storage.store(single_row_df, 'single')
-        loaded_df = storage.load('single')
-        
+
+        storage.store(single_row_df, "single")
+        loaded_df = storage.load("single")
+
         pd.testing.assert_frame_equal(single_row_df, loaded_df)
 
     def test_large_dataframe(self, temp_dir: Path):
         """Test storing and loading large DataFrame."""
         large_df = pd.DataFrame({
-            'id': range(1000),
-            'value': [f'value_{i}' for i in range(1000)]
+            "id": range(1000),
+            "value": [f"value_{i}" for i in range(1000)],
         })
         storage = CsvStorage(temp_dir)
-        
-        storage.store(large_df, 'large')
-        loaded_df = storage.load('large')
-        
+
+        storage.store(large_df, "large")
+        loaded_df = storage.load("large")
+
         pd.testing.assert_frame_equal(large_df, loaded_df)
 
     def test_special_characters_in_data(self, temp_dir: Path):
         """Test storing data with special characters."""
         special_df = pd.DataFrame({
-            'text': ['Hello, World!', 'Line\nBreak', 'Tab\tCharacter', 'Quote"Test'],
-            'unicode': ['café', 'naïve', 'résumé', '🚀']
+            "text": ["Hello, World!", "Line\nBreak", "Tab\tCharacter", 'Quote"Test'],
+            "unicode": ["café", "naïve", "résumé", "🚀"],
         })
         storage = CsvStorage(temp_dir)
-        
-        storage.store(special_df, 'special')
-        loaded_df = storage.load('special')
-        
+
+        storage.store(special_df, "special")
+        loaded_df = storage.load("special")
+
         pd.testing.assert_frame_equal(special_df, loaded_df)
 
     def test_nan_values(self, temp_dir: Path):
         """Test storing data with NaN values."""
         nan_df = pd.DataFrame({
-            'numbers': [1, 2, None, 4, 5],
-            'text': ['a', 'b', None, 'd', 'e']
+            "numbers": [1, 2, None, 4, 5],
+            "text": ["a", "b", None, "d", "e"],
         })
         storage = CsvStorage(temp_dir)
-        
-        storage.store(nan_df, 'nan_data')
-        loaded_df = storage.load('nan_data')
-        
+
+        storage.store(nan_df, "nan_data")
+        loaded_df = storage.load("nan_data")
+
         pd.testing.assert_frame_equal(nan_df, loaded_df)
 
     def test_very_long_column_names(self, temp_dir: Path):
         """Test storing data with very long column names."""
         long_name_df = pd.DataFrame({
-            'a' * 100: [1, 2, 3],
-            'b' * 100: [4, 5, 6]
+            "a" * 100: [1, 2, 3],
+            "b" * 100: [4, 5, 6],
         })
         storage = CsvStorage(temp_dir)
-        
-        storage.store(long_name_df, 'long_names')
-        loaded_df = storage.load('long_names')
-        
+
+        storage.store(long_name_df, "long_names")
+        loaded_df = storage.load("long_names")
+
         pd.testing.assert_frame_equal(long_name_df, loaded_df)
 
     def test_very_long_table_name(self, temp_dir: Path):
         """Test storing data with very long table name."""
-        df = pd.DataFrame({'value': [1, 2, 3]})
+        df = pd.DataFrame({"value": [1, 2, 3]})
         storage = CsvStorage(temp_dir)
-        
-        long_name = 'a' * 100
+
+        long_name = "a" * 100
         storage.store(df, long_name)
         loaded_df = storage.load(long_name)
-        
+
         pd.testing.assert_frame_equal(df, loaded_df)
 
 
@@ -305,33 +303,33 @@ class TestCompressionEdgeCases:
     def test_compression_with_empty_data(self, temp_dir: Path):
         """Test compression with empty DataFrame."""
         empty_df = pd.DataFrame()
-        storage = CsvStorage(temp_dir, compression='gzip')
-        
-        storage.store(empty_df, 'empty')
-        loaded_df = storage.load('empty')
-        
+        storage = CsvStorage(temp_dir, compression="gzip")
+
+        storage.store(empty_df, "empty")
+        loaded_df = storage.load("empty")
+
         # Empty DataFrames may have different inferred types, so check shape and columns
         assert empty_df.shape == loaded_df.shape
         assert list(empty_df.columns) == list(loaded_df.columns)
 
     def test_compression_with_single_character_data(self, temp_dir: Path):
         """Test compression with single character data."""
-        single_char_df = pd.DataFrame({'a': ['x']})
-        storage = CsvStorage(temp_dir, compression='gzip')
-        
-        storage.store(single_char_df, 'single_char')
-        loaded_df = storage.load('single_char')
-        
+        single_char_df = pd.DataFrame({"a": ["x"]})
+        storage = CsvStorage(temp_dir, compression="gzip")
+
+        storage.store(single_char_df, "single_char")
+        loaded_df = storage.load("single_char")
+
         pd.testing.assert_frame_equal(single_char_df, loaded_df)
 
     def test_different_compression_algorithms(self, temp_dir: Path):
         """Test different compression algorithms."""
-        df = pd.DataFrame({'data': [f'row_{i}' for i in range(100)]})
-        
-        for compression in ['gzip', 'bz2', 'xz']:
+        df = pd.DataFrame({"data": [f"row_{i}" for i in range(100)]})
+
+        for compression in ["gzip", "bz2", "xz"]:
             storage = CsvStorage(temp_dir / compression, compression=compression)
-            storage.store(df, 'data')
-            loaded_df = storage.load('data')
+            storage.store(df, "data")
+            loaded_df = storage.load("data")
             pd.testing.assert_frame_equal(df, loaded_df)
 
 
@@ -341,44 +339,43 @@ class TestBulkOperationsEdgeCases:
     def test_empty_bulk_operations(self, temp_dir: Path):
         """Test bulk operations with empty data."""
         storage = CsvStorage(temp_dir)
-        
+
         # Empty store_many
         storage.store_many({})
-        
+
         # Empty load_many
         results = storage.load_many([])
         assert results == {}
-        
+
         # Empty delete_many
         storage.delete_many([])
 
     def test_bulk_operations_with_single_item(self, temp_dir: Path, sample_df: pd.DataFrame):
         """Test bulk operations with single item."""
         storage = CsvStorage(temp_dir)
-        
+
         # Single item store_many
-        storage.store_many({'single': sample_df})
-        
+        storage.store_many({"single": sample_df})
+
         # Single item load_many
-        results = storage.load_many(['single'])
+        results = storage.load_many(["single"])
         assert len(results) == 1
-        pd.testing.assert_frame_equal(sample_df, results['single'])
-        
+        pd.testing.assert_frame_equal(sample_df, results["single"])
+
         # Single item delete_many
-        storage.delete_many(['single'])
+        storage.delete_many(["single"])
         assert len(storage) == 0
 
     def test_bulk_operations_with_duplicate_names(self, temp_dir: Path, sample_df: pd.DataFrame):
         """Test bulk operations with duplicate names."""
         storage = CsvStorage(temp_dir)
-        
+
         # This should work - last one wins
         dataframes = {
-            'duplicate': sample_df.copy(),
-            'duplicate': sample_df.copy()  # Same key twice
+            "duplicate": sample_df.copy(),  # Same key twice
         }
         storage.store_many(dataframes)
-        
+
         # Should have only one table
         assert len(storage) == 1
-        assert 'duplicate' in storage
+        assert "duplicate" in storage
